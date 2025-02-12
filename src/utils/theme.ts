@@ -1,0 +1,63 @@
+import {DefaultTheme} from '@react-navigation/native';
+
+export const theme = {
+  ...DefaultTheme,
+  primary: '#0CA1B6',
+  secondary: '#F58220',
+  errors: {
+    100: '#FF0000',
+    200: '#F24822',
+    300: '#FFF7F9',
+  },
+  lightViolet: '#F7F2FF',
+  lightPrimary: '#0CA1B61A',
+  disabled: '#0CA1B633',
+  info: {
+    100: '#E9F6FF',
+    200: '#3C9AFB',
+  },
+  success: {
+    100: '#00FF00',
+    200: '#00FF99',
+    300: '#E3FFFF',
+    400: '#00FF00',
+    500: '#317D35',
+    600: '#FFF7F9',
+    700: '#dfeef2',
+    800: '#5FAA46',
+    900: '#48B02C',
+  },
+  warning: {
+    100: '#ffA500',
+    200: '#F5822026',
+    800: '#F58220',
+  },
+  gray: {
+    10: '#F9F9F9',
+    50: '#F6F6F6',
+    100: '#808080',
+    200: '#ACACAC',
+    300: '#D4D4D4',
+    500: '#727677',
+    400: '#DDDDDD',
+    600: '#717171',
+    700: '#525252',
+    800: '#252527',
+  },
+  lightBlue: '#E8F1FD',
+  background: '#fff',
+  text: '#000',
+  white: '#fff',
+  black: '#000',
+  fontFamily: {
+    thin: 'Roboto-Thin',
+    light: 'Roboto-Light',
+    regular: 'Roboto-Regular',
+    medium: 'Roboto-Medium',
+    bold: 'Roboto-Bold',
+    italic: 'Roboto-Italic',
+    black: 'Roboto-black',
+  },
+
+  textInputFieldBorder: '#D5D5D5',
+};

@@ -1,0 +1,16 @@
+export const COLOR = {
+  TextInputBorder: '#D5D5D5',
+  black: '#000',
+  white: '#fff',
+  tabBackground: '#CDA2FD33',
+  darkGray: '#292929',
+  darkGoldenBrown: '#7C4404',
+  seaGreen: '#5aa793',
+  lavenderPurple: '#7A70ED',
+  lightLavenderBlue: '#8C84E9 ',
+  softLavender: '#8881DE',
+  bgBlue: '#493cd6',
+  bgRed: '#F44336',
+  silverLight: '#cccccc',
+  lightRed: '#FFCDD2',
+};
