@@ -47,7 +47,7 @@ const HeaderView = (props: HeaderProps) => {
               {headerTitle}
             </Text>
             <Text style={styles.sbuHeading}>
-              There are 3 new events in your area.
+              Welcome to Family365
             </Text>
           </View>
           <View style={styles.rightSection}>

@@ -11,12 +11,11 @@ export enum participation {
 }
 
 export const tabMenuItems: ITabMenuItem[] = [
-  { text: 'Menu', isLock: false },
+  { text: 'Food Menu', isLock: false },
+  { text: 'Vision & Mission', isLock: false },
+  { text: 'Our Team', isLock: false },
   { text: 'Certificate List', isLock: false },
-  { text: 'Our Team', isLock: true },
-  { text: 'Vision & Mission', isLock: true },
   { text: 'Childrens & elders', isLock: true },
-  { text: 'Certification', isLock: true },
 ];
 
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

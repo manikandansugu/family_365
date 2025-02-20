@@ -42,14 +42,15 @@ import { resetState } from '../redux/slices/dataSlice';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 let clearTime: any;
-const OrphanageDetailsScreen = () => {
+const OrphanageScreen = ({route}) => {
   const navigation = useNavigation<any>();
   const dispatch = useDispatch<AppDispatch>();
   const [logoUri, setLogoUri] = useState<string | null>(null);
   const [loadingLogo, setLoadingLogo] = useState<boolean>(true);
-  const {OrphanageDetails} = useSelector(
-    (state: RootState) => state.orphanageDetails,
-  );
+  // const {OrphanageDetails} = useSelector(
+  //   (state: RootState) => state.orphanageDetails,
+  // );
+  const {OrphanageDetails} = route.params;
   console.log(OrphanageDetails)
   const [selectedTabMenu, setSelectedTabMenu] = useState<any>(
     tabMenuItems?.at(0)?.text,
@@ -77,9 +78,6 @@ const OrphanageDetailsScreen = () => {
     }
   };
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [numberOfMember, setNumberOfMember] = useState<any>();
-  const [totalAmount, setTotalAmount] = useState<any>();
   const [isTextExpand, setIsTextExpand] = useState<boolean>(false);
   const [localInput, setLocalInput] = useState<any[]>([
     {
@@ -96,46 +94,23 @@ const OrphanageDetailsScreen = () => {
   const handleTabSelect = (tabText: string) => {
     setSelectedTabMenu(tabText);
   };
-  const onSwipe = () => {
-    const validatedBookings = validateBookings(localInput);
-    setLocalInput(validatedBookings);
-    const error = validatedBookings.some(
-      (itm: any) => itm.isDescriptionError || itm.isDobError,
-    );
-    if (error) {
-      return;
-    } else {
-      dispatch(memberData(localInput));
-      setModalVisible(false);
-      navigation.navigate('register');
-    }
-  };
+
   useEffect(() => {
     // Fetch the logo for the orphanage
-    fetchOrphanageLogo(OrphanageDetails[0]?.data?.orphanageId);
-  
-    // Set a timer to open the modal after 5 seconds
-    const timer = setTimeout(() => {
-      setModalVisible(true);
-    }, 5000);
-  
-    // Cleanup function to clear the timer when the component unmounts
-    return () => {
-      clearTimeout(timer);
-    };
+    fetchOrphanageLogo(OrphanageDetails[0]?.orphanageId);
   }, []);
 
-  // useEffect(() => {
-  //   const onBackPress = () => {
-  //     dispatch(resetState());
-  //     return false; // Allow default back behavior
-  //   };
+  useEffect(() => {
+    const onBackPress = () => {
+      dispatch(resetState());
+      return false; // Allow default back behavior
+    };
   
-  //   BackHandler.addEventListener('hardwareBackPress', onBackPress);
-  //   return () => {
-  //     BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  //   };
-  // }, [dispatch]);
+    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    };
+  }, [dispatch]);
   
 
   const _fist_section = (orphanage: OrphanageData) => {
@@ -252,11 +227,10 @@ const OrphanageDetailsScreen = () => {
               </Text>
             </View>
 
-            <TouchableOpacity
-              style={styles.contributeButton}
-              onPress={() => setModalVisible(true)}>
+            <View
+              style={styles.contributeButton}>
               <Text style={styles.contributeButtonText}>Contribute</Text>
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       </GradiantProvider>
@@ -456,34 +430,41 @@ const OrphanageDetailsScreen = () => {
   
 
   return (
-    <ContainerProvider>
-      <TopInfoBar type={1} headerTitle="Orphanage Details" />
-      <ScrollView bounces={false}>
-        <View style={styles.bodyContainer}>
-          {_fist_section(OrphanageDetails[0].data)}
-          {_second_section()}
-          {_third_section(OrphanageDetails[0].data)}
-          {_tab_section()}
-          {_fourth_section(OrphanageDetails[0].data)}
-        </View>
-      </ScrollView>
-      <MealProviderModal
-        setModalVisible={setModalVisible}
-        modalVisible={modalVisible}
-        clearTime={clearTime}
-        data={OrphanageDetails}
-        setNumberOfMember={setNumberOfMember}
-        setTotalAmount={setTotalAmount}
-        onSwipe={onSwipe}
-        localInput={localInput}
-        setLocalInput={setLocalInput}
-      />
-    </ContainerProvider>
+    <>
+      <ContainerProvider>
+        <TopInfoBar type={1} headerTitle="Orphanage Details" />
+        <ScrollView bounces={false}>
+          {OrphanageDetails?.map(
+            (orphanage: any, index: number) => {
+              return (
+                <View style={[styles.bodyContainer]} key={index}>
+                  {_fist_section(orphanage)}
+                  {/* {_second_section()} */}
+                  {_third_section(orphanage)}
+                  {_tab_section()}
+                  {_fourth_section(orphanage)}
+                </View>
+              );
+            },
+          )}
+        </ScrollView>
+        {/* <MealProviderModal
+          setModalVisible={setModalVisible}
+          modalVisible={modalVisible}
+          clearTime={clearTime}
+          data={OrphanageDetails}
+          setNumberOfMember={setNumberOfMember}
+          setTotalAmount={setTotalAmount}
+          onSwipe={onSwipe}
+          localInput={localInput}
+          setLocalInput={setLocalInput}
+        /> */}
+      </ContainerProvider>
+    </>
   );
-  
 };
 
-export default OrphanageDetailsScreen;
+export default OrphanageScreen;
 
 const styles = StyleSheet.create({
   bodyContainer: {
@@ -677,22 +658,22 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     marginHorizontal: 'auto',
   },
-  list: {
-    alignItems: 'flex-start',
-    backgroundColor: 'white',
-    padding: 10,
-    minHeight: 220,
-    borderRadius: 15,
-  },
-  dotedLined: {
-    width: 70,
-    height: 1,
-    borderTopColor: '#717171',
-    borderTopWidth: 1,
-    borderStyle: 'dotted',
-    marginHorizontal: 'auto',
-    marginVertical: 2,
-  },
+  // list: {
+  //   alignItems: 'flex-start',
+  //   backgroundColor: 'white',
+  //   padding: 10,
+  //   minHeight: 220,
+  //   borderRadius: 15,
+  // },
+  // dotedLined: {
+  //   width: 70,
+  //   height: 1,
+  //   borderTopColor: '#717171',
+  //   borderTopWidth: 1,
+  //   borderStyle: 'dotted',
+  //   marginHorizontal: 'auto',
+  //   marginVertical: 2,
+  // },
   titleContainer: {
     flexDirection: 'row',
     columnGap: 5,

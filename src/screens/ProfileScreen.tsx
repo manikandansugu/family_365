@@ -28,6 +28,7 @@ import {
 import { AppDispatch } from '../redux/store';
 import { useDispatch } from 'react-redux';
 import { resetState } from '../redux/slices/dataSlice';
+import {useToaster} from '../components/providers/ToasterProvider';
 
 // --- Import the navigation hook
 import { useNavigation } from '@react-navigation/native';
@@ -57,10 +58,10 @@ const profileListData = [
     icon: <ProfileDonationHistoryIcon />,
     title: 'Donation History',
   },
-  {
-    icon: <ProfileDOwnloadIcon />,
-    title: 'Download Receipt',
-  },
+  // {
+  //   icon: <ProfileDOwnloadIcon />,
+  //   title: 'Download Receipt',
+  // },
   {
     icon: <ProfileAnswerIcon />,
     title: 'Frequently Asked Questions',
@@ -72,6 +73,7 @@ const profileListData = [
 ];
 
 const ProfileScreen = () => {
+    const {showToast} = useToaster();
   const { user, setUser } = useAuthState() ?? {};
   const dispatch = useDispatch<AppDispatch>();
     const [sponsors, setSponsors] = useState([]); // To store API response
@@ -91,8 +93,8 @@ const ProfileScreen = () => {
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
-      // Filter out bookings with a date in the past (compare only the date part)
-      const futureBookings = bookings.filter(booking => {
+      // Filter for future bookings (including today)
+      const futureBookings = bookings.filter((booking) => {
         const bookingDate = new Date(booking.bookingDate);
         const bookingDateOnly = new Date(
           bookingDate.getFullYear(),
@@ -102,44 +104,68 @@ const ProfileScreen = () => {
         return bookingDateOnly >= today;
       });
     
-      if (futureBookings.length === 0) {
-        return null;
-      }
-    
-      // Find the booking with the earliest date
-      const upcomingBooking = futureBookings.reduce((earliest, current) => {
-        const earliestDate = new Date(earliest.bookingDate);
-        const currentDate = new Date(current.bookingDate);
-        return earliestDate <= currentDate ? earliest : current;
-      });
-    
-      return upcomingBooking.bookingDate;
-    }
-
-    
-  const fetchSponsors = async () => {
-    try {
-      const response = await API_INSTANCE.get(`v1/family-member/fetch-all-bookings-orphanage?orphangeId=${user?.orphanageId}`
-      );
-      const result = await response.data;
-
-      if (result.data) {
-        console.log('sponsor', result?.data)
-        const upcomingDate = getUpcomingBookingDate(result?.data);
-        console.log(formatDate(upcomingDate))
-        if(upcomingDate)
-        setSponsors(formatDate(upcomingDate));
-      else setSponsors('No sponsored meal')
+      if (futureBookings.length > 0) {
+        // Find the earliest future booking date
+        const upcomingBooking = futureBookings.reduce((earliest, current) => {
+          const earliestDate = new Date(earliest.bookingDate);
+          const currentDate = new Date(current.bookingDate);
+          return earliestDate <= currentDate ? earliest : current;
+        });
+        return upcomingBooking.bookingDate;
       } else {
-        throw new Error('Failed to fetch sponsor data');
+        // If no future bookings, then check for past bookings
+        const pastBookings = bookings.filter((booking) => {
+          const bookingDate = new Date(booking.bookingDate);
+          const bookingDateOnly = new Date(
+            bookingDate.getFullYear(),
+            bookingDate.getMonth(),
+            bookingDate.getDate()
+          );
+          return bookingDateOnly < today;
+        });
+    
+        if (pastBookings.length > 0) {
+          // Find the most recent past booking date
+          const recentBooking = pastBookings.reduce((latest, current) => {
+            const latestDate = new Date(latest.bookingDate);
+            const currentDate = new Date(current.bookingDate);
+            return latestDate >= currentDate ? latest : current;
+          });
+          return recentBooking.bookingDate;
+        } else {
+          return null;
+        }
       }
-    } catch (err) {
-      console.error(err);
-      setError('No sponsor data available for today');
-    } finally {
-      // setLoading(false);
     }
-  };
+    
+
+    
+    const fetchSponsors = async () => {
+      try {
+        const response = await API_INSTANCE.get(
+          `v1/family-member/fetch-all-bookings-orphanage?orphangeId=${user?.orphanageId}`
+        );
+        const result = await response.data;
+    
+        if (result.data) {
+          console.log('sponsor', result?.data);
+          const bookingDate = getUpcomingBookingDate(result?.data);
+          if (bookingDate) {
+            setSponsors(formatDate(bookingDate));
+          } else {
+            setSponsors('No sponsored meal');
+          }
+        } else {
+          throw new Error('Failed to fetch sponsor data');
+        }
+      } catch (err) {
+        console.error(err);
+        setError('No sponsor data available for today');
+      } finally {
+        // setLoading(false);
+      }
+    };
+    
 
   useEffect(() => {
     fetchSponsors();
@@ -150,8 +176,56 @@ const ProfileScreen = () => {
 
   const handleListItemPress = (title: string) => {
     // If the user taps on "Notification", navigate to Notification
+    // if (title === 'Notification') {
+    //   navigation.navigate('notificationScreen');
+    // }
+    if (title === 'Personal detail') {
+      // show
+      showToast({
+        message: 'Page is being developed',
+        duration: 5000,
+        status: 'success',
+        slideFrom: 'right',
+      });
+    }
+    if (title === 'Frequently Asked Questions') {
+      // show
+      // showToast({
+      //   message: 'Page is being developed',
+      //   duration: 5000,
+      //   status: 'success',
+      //   slideFrom: 'right',
+      // });
+      navigation.navigate('faqScreen');
+    }
+    if (title === 'Raise an Issue') {
+      // show
+      // showToast({
+      //   message: 'Page is being developed',
+      //   duration: 5000,
+      //   status: 'success',
+      //   slideFrom: 'right',
+      // });
+      navigation.navigate('raiseIssueScreen');
+      
+    }
+    if (title === 'Donation History') {
+      // show
+      showToast({
+        message: 'Page is being developed',
+        duration: 5000,
+        status: 'success',
+        slideFrom: 'right',
+      });
+    }
     if (title === 'Notification') {
-      navigation.navigate('notificationScreen');
+      // show
+      showToast({
+        message: 'Page is being developed',
+        duration: 5000,
+        status: 'success',
+        slideFrom: 'right',
+      });
     }
     // You can add more conditions here if you want to navigate
     // to other screens based on the title
@@ -210,7 +284,7 @@ const ProfileScreen = () => {
             rowGap: 10,
           }}>
           <Text style={{ fontSize: 16, fontWeight: '700', color: COLOR.white }}>
-            Your next sponsored meal is on{' '}
+          Date of Meal Sponsorship{' '}
           </Text>
           <CustomButtonField
             style={{
@@ -291,7 +365,7 @@ const ProfileScreen = () => {
             }}>
             <Text style={{ color: COLOR.black, fontSize: 14 }}>Logout</Text>
           </Pressable>
-          <Text style={{ color: COLOR.black, fontSize: 14 }}>Family 365</Text>
+          <Text style={{ color: COLOR.black, fontSize: 14 }}>Family365</Text>
         </View>
       </View>
     </ContainerProvider>

@@ -370,16 +370,6 @@ export const handleIdentityValidation = (props: any) => {
         };
       }
     }
-    else if (key === 'profession') {
-      if (!value) {
-        payload = {
-          message: 'Enter profession details',
-          duration: 3000,
-          status: 'error',
-          slideFrom: 'right',
-        };
-      }
-    }
   });
 
   if (payload) {

@@ -422,8 +422,8 @@ const styles = StyleSheet.create({
     minHeight: 120,
   },
   logoImage: {
-    width: 120,
-    height: 78,
+    width: 160,
+    height: 86,
   },
 
   // ID Section styles

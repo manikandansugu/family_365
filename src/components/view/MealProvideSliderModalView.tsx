@@ -9,6 +9,8 @@ import {
   TouchableOpacity,
   ImageBackground,
   Image,
+  Platform,
+  Linking
 } from 'react-native';
 import {COLOR} from '../../utils/colors';
 import GradiantProvider from '../providers/GradiantProvider';
@@ -50,7 +52,7 @@ const MealProviderModal = ({
         style={styles.footerSection}>
         <View style={styles.innerContainerForFooter}>
           <WhiteHeartIcon />
-          <Text style={styles.footerText}>World is one Family
+          <Text style={styles.footerText}>World is One Family
           </Text>
           <TouchableOpacity
             style={styles.provideMealButton}
@@ -61,6 +63,27 @@ const MealProviderModal = ({
       </GradiantProvider>
     );
   };
+
+     const dialCall = (number) => {
+        let phoneUrl = '';
+    
+        if (Platform.OS === 'android') {
+          phoneUrl = `tel:${number}`;
+        } else {
+          // iOS supports telprompt for a smoother experience
+          phoneUrl = `telprompt:${number}`;
+        }
+    
+        Linking.canOpenURL(phoneUrl)
+          .then((supported) => {
+            if (!supported) {
+              Alert.alert('Error', 'Phone dialer is not available');
+            } else {
+              return Linking.openURL(phoneUrl);
+            }
+          })
+          .catch((err) => console.error('An error occurred', err));
+      };
 
   const _firstSection = () => {
     return (
@@ -90,7 +113,7 @@ const MealProviderModal = ({
               </View> */}
             </View>
             <View style={styles.boyImage}>
-              <Image source={require('../../assets/images/boy.png')} />
+              <Image source={require('../../assets/images/banner.png')} />
             </View>
           </View>
         </GradiantProvider>
@@ -140,7 +163,7 @@ const MealProviderModal = ({
               <Pressable onPress={() => setModalVisible(!modalVisible)}>
                 <CancelIcon style={styles.cancelIcon} />
               </Pressable>
-              <Pressable style={styles.helpButton}>
+              <Pressable style={styles.helpButton} onPress={() => dialCall(data?.at(0)?.data?.mobileNo)}>
                 <Text>Help</Text>
                 <HeadPhoneIcon />
               </Pressable>

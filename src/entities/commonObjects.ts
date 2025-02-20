@@ -31,6 +31,7 @@ export interface TextInputFieldInterface {
   backgroundColor: string;
   height: number;
   radius: number;
+  width: number;
   textColor: string;
   type?: string | undefined;
   value: any;

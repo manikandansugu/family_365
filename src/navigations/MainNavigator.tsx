@@ -47,6 +47,9 @@ import NeedScreen from '../screens/NeedScreen';
 import NotificationScreen from '../screens/NotificationScreen';
 import ActivitiesScreen from '../screens/ActivityScreen';
 import { TabBarVisibilityProvider } from '../context/TabBarVisibilityContext'; // Import Context
+import OrphanageScreen from '../screens/OrphanageScreen';
+import FAQScreen from '../screens/FAQScreen';
+import RaiseIssueScreen from '../screens/RaiseIssueScreen';
 
 // interface
 export type MainNavigatorParamList = {
@@ -56,6 +59,9 @@ export type MainNavigatorParamList = {
   needScreen: undefined;
   activitiesScreen: undefined;
   notificationScreen: undefined;
+  orphanageScreen: undefined;
+  faqScreen: undefined;
+  raiseIssueScreen: undefined;
 };
 
 // global values
@@ -76,7 +82,10 @@ const MainNavigator = () => {
         <Stack.Screen name="galleryScreen" component={GalleryScreen} />
         <Stack.Screen name="sponserScreen" component={SponserScreen} />
         <Stack.Screen name="notificationScreen" component={NotificationScreen} />
+        <Stack.Screen name="faqScreen" component={FAQScreen} />
         <Stack.Screen name="needScreen" component={NeedScreen} />
+        <Stack.Screen name="orphanageScreen" component={OrphanageScreen} />
+        <Stack.Screen name="raiseIssueScreen" component={RaiseIssueScreen} />
         <Stack.Screen name="activitiesScreen" component={ActivitiesScreen} />
       </Stack.Navigator>
     </TabBarVisibilityProvider>

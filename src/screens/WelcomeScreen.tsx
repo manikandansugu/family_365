@@ -23,9 +23,9 @@ const WelcomeScreen = () => {
             source={require('../assets/images/whitelogo.png')}
             style={styles.logo}
           />
-          <Text style={styles.welcomeText}>An Initiative by</Text>
-          <Text style={styles.welcomeText}>INSPIRATIONS</Text>
-          <Text style={styles.welcomeText2}>Public Charitable Trust</Text>
+          <Text style={styles.welcomeText}>AN INITIATIVE </Text>  <Text style={styles.welcomeText}>BY</Text>
+          <Text style={styles.welcomeText1}>INSPIRATIONS</Text>
+          <Text style={styles.welcomeText2}>PUBLIC CHARITABLE TRUST</Text>
         </View>
 
         <View style={styles.bottomSection}>
@@ -83,10 +83,10 @@ const styles = StyleSheet.create({
     fontSize: width * 0.045,
     fontWeight: '600',
     color: COLOR.white,
-    marginVertical: height * 0.01,
+    marginVertical: height * 0.0001,
   },
   welcomeText1: {
-    fontSize: width * 0.06,
+    fontSize: width * 0.08,
     fontWeight: '600',
     color: COLOR.white,
     marginVertical: height * 0.01,

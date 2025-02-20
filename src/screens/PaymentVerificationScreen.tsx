@@ -134,7 +134,7 @@ const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
               const res =  {
                 "memberId": response?.data?.data.memberId,
                 "totalPaymentMade": OrphanageDetails?.at(0)?.data?.mealAmountPerDay,
-                "bookingDate": formattedDate,
+                "bookingDate": formattedDateDob,
                 "orphanageId": OrphanageDetails?.at(0)?.data?.orphanageId,
                 "memberNameBooked": memberData[index]?.memberNameBooked,
                 "memberNameBookedDob": formattedDateDob,
@@ -266,7 +266,7 @@ const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
         <ImageBackgroundProvider style={styles.innerContainer}>
           <View style={styles.logoSection}>
             <Image
-              source={require('../assets/images/logo.png')}
+              source={require('../assets/images/whitelogo.png')}
               style={styles.logoImage}
             />
           </View>
@@ -377,8 +377,8 @@ const styles = StyleSheet.create({
     minHeight: 120,
   },
   logoImage: {
-    width: 120,
-    height: 78,
+    width: 160,
+    height: 86,
   },
 
   // ID Section styles

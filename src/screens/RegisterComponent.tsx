@@ -166,7 +166,7 @@ const RegisterComponent = () => {
          backgroundColor={theme.white}
          placeholder={'Gender'}
          placeholderTextColor={theme.black}
-         dropDownValues={['Male', 'Female', 'Others']}
+         dropDownValues={['Male', 'Female']}
          onChange={setGender}
          value={gender}
 
@@ -213,27 +213,34 @@ const RegisterComponent = () => {
                   onChange={setAddress2}
                   value={address2}
                 />
-                <TextInputComponent
-                  radius={16}
-                  height={40}
-                  textColor={theme.black}
-                  backgroundColor={theme.white}
-                  placeholder={'City'}
-                  placeholderTextColor={theme.black}
-                  onChange={setCity}
-                  value={city}
-                />
-                <TextInputComponent
-                  radius={16}
-                  height={40}
-                  textColor={theme.black}
-                  backgroundColor={theme.white}
-                  placeholder={'State'}
-                  placeholderTextColor={theme.black}
-                  onChange={setState}
-                  value={state}
-                />
-                <TextInputComponent
+              <View style={styles.rowContainer}>
+  <TextInputComponent
+    radius={16}
+    height={40}
+    width={140}
+    textColor={theme.black}
+    backgroundColor={theme.white}
+    placeholder={'City'}
+    placeholderTextColor={theme.black}
+    onChange={setCity}
+    value={city}
+    editable={false}
+  />
+  <TextInputComponent
+    radius={16}
+    height={40}
+    width={150}
+    textColor={theme.black}
+    backgroundColor={theme.white}
+    placeholder={'State'}
+    placeholderTextColor={theme.black}
+    onChange={setState}
+    value={state}
+    editable={false}
+  />
+</View>
+
+                {/* <TextInputComponent
                   radius={16}
                   height={40}
                   textColor={theme.black}
@@ -242,7 +249,7 @@ const RegisterComponent = () => {
                   placeholderTextColor={theme.black}
                   onChange={setCountry}
                   value={country}
-                />
+                /> */}
                 {/* <TextFieldDropdown
                   radius={16}
                   height={40}
@@ -292,6 +299,12 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     resizeMode: 'cover',
   },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 10, // adjust spacing as needed
+  },
   logoSection: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -308,8 +321,8 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   logoImage: {
-    width: 120,
-    height: 78,
+    width: 160,
+    height: 86,
   },
   formTopHeaderContainer: {
     justifyContent: 'center',

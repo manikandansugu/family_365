@@ -4,7 +4,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  Platform,
+  Alert,
   ActivityIndicator,
+  Dimensions,
+  Image,
+  Linking
 } from 'react-native';
 import ContainerProvider from '../components/providers/ContainerProvider';
 import { useAuthState } from '../context/AuthContext';
@@ -17,6 +22,10 @@ import {
 import CustomButtonField from '../components/fields/CustomButtonField';
 import API_INSTANCE from '../config/apiClient';
 
+const { width } = Dimensions.get('window');
+const guidelineBaseWidth = 375;
+const scale = size => (width / guidelineBaseWidth) * size;
+
 const NeedsScreen = () => {
   const { user } = useAuthState() ?? {};
   const [needs, setNeeds] = useState([]);
@@ -25,15 +34,20 @@ const NeedsScreen = () => {
 
   const fetchNeedsData = async () => {
     try {
-      console.log(user?.orphanageId)
-      const response = await API_INSTANCE.post(`/v1/orphanage/fetch-needs?id=${user?.orphanageId}`);
+      console.log(user);
+      const response = await API_INSTANCE.post(
+        `/v1/orphanage/fetch-needs?id=${user?.orphanageId}`
+      );
       const json = await response.data;
-console.log(json.data)
+      console.log(json.data);
+      
       if (!json.data) {
         throw new Error(json.message || 'Failed to fetch needs');
       }
 
+      // Uncomment the following line if there are needs to display:
       setNeeds(json.data);
+      // setNeeds([]); // For now, we'll simulate no needs available.
     } catch (err) {
       console.error('Error fetching needs:', err?.response);
       setError('No needs available, Please check later.');
@@ -42,17 +56,32 @@ console.log(json.data)
     }
   };
 
+    const dialCall = (number) => {
+      let phoneUrl = '';
+  
+      if (Platform.OS === 'android') {
+        phoneUrl = `tel:${number}`;
+      } else {
+        // iOS supports telprompt for a smoother experience
+        phoneUrl = `telprompt:${number}`;
+      }
+  
+      Linking.canOpenURL(phoneUrl)
+        .then((supported) => {
+          if (!supported) {
+            Alert.alert('Error', 'Phone dialer is not available');
+          } else {
+            return Linking.openURL(phoneUrl);
+          }
+        })
+        .catch((err) => console.error('An error occurred', err));
+    };
+
   useEffect(() => {
     fetchNeedsData();
   }, []);
 
   const renderNeeds = () => {
-    if (needs.length === 0) {
-      return (
-        <Text style={styles.infoText}>No needs found for this orphanage.</Text>
-      );
-    }
-
     return needs.map((item, index) => (
       <View style={styles.card} key={index}>
         {/* Top Section: Need & Approval */}
@@ -78,12 +107,16 @@ console.log(json.data)
             {/* Start Date Row */}
             <View style={[styles.detailRow, styles.dottedBorder]}>
               <CalenderColorIcon width={18} height={18} />
-              <Text style={styles.detailText}>Start Date: {item.startDate}</Text>
+              <Text style={styles.detailText}>
+                Start Date: {item.startDate}
+              </Text>
             </View>
             {/* End Date Row (no dotted border on last row) */}
             <View style={styles.detailRow}>
               <CalenderColorIcon width={18} height={18} />
-              <Text style={styles.detailText}>End Date: {item.endDate}</Text>
+              <Text style={styles.detailText}>
+                End Date: {item.endDate}
+              </Text>
             </View>
           </View>
         </View>
@@ -92,9 +125,7 @@ console.log(json.data)
         <View style={styles.buttonWrapper}>
           <CustomButtonField
             buttonText="Support"
-            onPress={() => {
-              console.log('Support button pressed for:', item.need);
-            }}
+            onPress={() => dialCall(user?.mobileNo)}
             style={styles.supportButton}
             textColor="#fff"
             textStyle={styles.supportButtonText}
@@ -106,8 +137,9 @@ console.log(json.data)
 
   if (loading) {
     return (
-        <ContainerProvider
-        headerProps={{type: 2, headerTitle: `Hello,${user?.firstName}`}}>
+      <ContainerProvider
+        headerProps={{ type: 2, headerTitle: `Hello, ${user?.firstName}` }}
+      >
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color="#0000ff" />
           <Text style={{ marginTop: 10 }}>Loading...</Text>
@@ -118,8 +150,9 @@ console.log(json.data)
 
   if (error) {
     return (
-        <ContainerProvider
-        headerProps={{type: 2, headerTitle: `Hello,${user?.firstName}`}}>
+      <ContainerProvider
+        headerProps={{ type: 2, headerTitle: `Hello, ${user?.firstName}` }}
+      >
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
         </View>
@@ -131,9 +164,29 @@ console.log(json.data)
     <ContainerProvider
       headerProps={{ type: 2, headerTitle: `Hello, ${user?.firstName}` }}
     >
-      <ScrollView style={styles.container}>
-        <Text style={styles.mainHeading}>Needs</Text>
-        {renderNeeds()}
+      <ScrollView
+        style={styles.container}
+        // If no needs are available, center the content vertically and horizontally.
+        contentContainerStyle={
+          needs.length === 0 ? { flex: 1, justifyContent: 'center', alignItems: 'center' } : {}
+        }
+      >
+        {needs.length === 0 ? (
+          <>
+            <Image
+              source={require('../assets/images/noneeds.png')}
+              style={styles.sponImage}
+            />
+            <Text style={styles.infoText}>
+            No Requirements from the Orphanage at the Moment, But We'll Keep You Updated!
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.mainHeading}>Needs</Text>
+            {renderNeeds()}
+          </>
+        )}
       </ScrollView>
     </ContainerProvider>
   );
@@ -146,6 +199,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f9f9',
     paddingHorizontal: 12,
+  },
+  sponImage: {
+    width: scale(160),
+    height: scale(120),
+    resizeMode: 'cover',
+    alignContent: 'center',
+    alignSelf: 'center',
   },
   mainHeading: {
     fontSize: 22,
@@ -172,24 +232,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#666',
     marginVertical: 20,
-    fontSize: 16,
+    fontSize: 14,
   },
-
   // Card Container
   card: {
     width: '100%',
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 20,
-
     // Subtle shadow
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
-    // elevation: 0.1,
   },
-
   // Top Section
   topSection: {
     backgroundColor: '#9ACEF8',
@@ -210,7 +266,6 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 8,
   },
-
   // Bottom Section
   bottomSection: {
     backgroundColor: '#FFC478',
@@ -218,7 +273,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     marginTop: 5,
     borderRadius: 10,
-    paddingBottom: 10, // more space at bottom if needed
+    paddingBottom: 10,
   },
   detailsContainer: {
     backgroundColor: '#fff',
@@ -236,20 +291,15 @@ const styles = StyleSheet.create({
     color: '#000',
     marginLeft: 6,
   },
-
   // Dotted border style (optional for middle rows)
   dottedBorder: {
     borderBottomWidth: 1,
     borderBottomColor: '#000',
     borderStyle: 'dotted',
   },
-
   // Button
   buttonWrapper: {
     alignItems: 'center',
-    // backgroundColor: '#f9f9f9', // remove this line
-    // or replace with:
-    // backgroundColor: 'transparent',
     paddingVertical: 5,
     borderRadius: 10,
   },

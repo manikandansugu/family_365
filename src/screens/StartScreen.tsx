@@ -1,4 +1,12 @@
-import {Image, Keyboard, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  Keyboard,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ImageBackgroundProvider from '../components/providers/BackgroundGradiantProvider';
 import ContainerProvider from '../components/providers/ContainerProvider';
@@ -10,7 +18,6 @@ import ButtonFieldComponent from '../components/fields/ButtonFieldComponent';
 import {COLOR} from '../utils/colors';
 import KeyboardAvoidingProvider from '../components/providers/KeyboardAvoidingProvider';
 import {AuthText, participation} from '../entities/entryObjects';
-// import API_INSTANCE from '../config/apiClient';
 import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
 import {useAuthState} from '../context/AuthContext';
@@ -28,12 +35,10 @@ import {handleErrorValidate} from '../utils/helpers';
 const StartScreen = () => {
   const {showToast} = useToaster();
   const dispatch = useDispatch<AppDispatch>();
+  const navigation = useNavigation<any>();
 
-  const [selectedTabText, setSelectedTabText] = useState<string>(
-    AuthText.signup,
-  );
+  const [selectedTabText, setSelectedTabText] = useState<string>(AuthText.signup);
   const [selectedParticipation, setSelectedRadioText] = useState<string>();
-
   const [areaPincode, setAreaPincode] = useState<string>();
   const [userName, setUserName] = useState<string>();
   const [password, setPassword] = useState<string>();
@@ -41,20 +46,16 @@ const StartScreen = () => {
   const {setUser} = useAuthState() ?? {};
   const [userError, setUserError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-
-  const navigation = useNavigation<any>();
+  const [showContactModal, setShowContactModal] = useState(false);
 
   const handleRadioSelect = (text: any) => {
     setSelectedRadioText(text);
   };
-  const handleUserNameChange = (value) => {
+
+  const handleUserNameChange = (value: string) => {
     // Remove non-digit characters
     const numericValue = value.replace(/\D/g, '');
-
-    // Enforce max 10 digits
-    // if (numericValue.length <= 10) {
-      setUserName(numericValue);
-    // }
+    setUserName(numericValue);
 
     // Real-time validation: Show error if length is not exactly 10
     if (numericValue.length > 10) {
@@ -64,22 +65,20 @@ const StartScreen = () => {
     }
   };
 
-  const handlePasswordChange = (value) => {
-    // if (value.length <= 15) {
-      setPassword(value);
-    // }
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
 
     if (value.length > 15) {
-      setPasswordError('Password should not be greater 15 characters');
+      setPasswordError('Password should not be greater than 15 characters');
     } else {
       setPasswordError('');
     }
   };
+
   const handleLogin = async () => {
     Keyboard.dismiss();
     try {
       const error = handleErrorValidate({userName, password});
-
       if (error) {
         return showToast(error);
       }
@@ -95,7 +94,7 @@ const StartScreen = () => {
         if (loginRes?.data?.data) {
           setUser(loginRes?.data?.data);
         }
-      }else{
+      } else {
         showToast({
           message: response?.data?.message,
           duration: 5000,
@@ -106,7 +105,9 @@ const StartScreen = () => {
       }
     } catch (error: any) {
       showToast({
-        message: error?.response?.data?.description ?? error?.response?.data?.message,
+        message:
+          error?.response?.data?.description ??
+          error?.response?.data?.message,
         duration: 5000,
         status: 'error',
         slideFrom: 'right',
@@ -134,22 +135,43 @@ const StartScreen = () => {
       }
     } catch (error: any) {
       setLoading(false);
-      showToast({
-        message: error?.response?.data?.message,
-        duration: 5000,
-        status: 'error',
-        slideFrom: 'right',
-      });
+      console.log('Error in HandleParticipate:', error?.response?.data?.message);
+      if (
+        error?.response?.data?.message ===
+        'No Matching Orphanage found , please contact administrator'
+      ) {
+        // Show modal popup with Contact Now option
+        setShowContactModal(true);
+      } else {
+        showToast({
+          message: error?.response?.data?.message,
+          duration: 5000,
+          status: 'error',
+          slideFrom: 'right',
+        });
+      }
     }
   };
+
+  const handleContactNow = () => {
+    // Implement your contact logic here.
+    // For example, navigate to a Contact screen:
+    navigation.navigate('ContactScreen');
+    // Hide the modal after pressing the button.
+    setShowContactModal(false);
+  };
+
   useEffect(() => {
     dispatch(resetState());
-  }, []);
+  }, [dispatch]);
+
   const _signup_section = () => {
     return (
       <>
         <View style={styles.inputSection}>
-          <Text style={styles.inputAboveText}>Explore Home Around You Orphanages Nearby</Text>
+          <Text style={styles.inputAboveText}>
+            Explore home around you nearby
+          </Text>
           <TextInputComponent
             radius={16}
             height={50}
@@ -161,7 +183,7 @@ const StartScreen = () => {
             placeholderTextColor={theme.black}
             type="number"
           />
-          <Text style={styles.inputAboveText}>Choose Your Family </Text>
+          <Text style={styles.inputAboveText}>Choose Your Family</Text>
           <View style={styles.participentSection}>
             <ParticipantComponent
               value={selectedParticipation}
@@ -170,9 +192,11 @@ const StartScreen = () => {
           </View>
         </View>
         <View style={styles.btnSection}>
-             <TouchableOpacity style={styles.btnContainer} onPress={HandleParticipate}>
-                <Text style={styles.btnText}>Show Nearby Home</Text>
-              </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btnContainer}
+            onPress={HandleParticipate}>
+            <Text style={styles.btnText}>Show Nearby Home</Text>
+          </TouchableOpacity>
           {/* <ButtonFieldComponent onPress={HandleParticipate} /> */}
         </View>
       </>
@@ -183,18 +207,18 @@ const StartScreen = () => {
     return (
       <>
         <View style={styles.loginContainer}>
-           <TextInputComponent
-        backgroundColor={theme.white}
-        height={50}
-        radius={16}
-        placeholder="Mobile Number"
-        placeholderTextColor={theme.black}
-        textColor={theme.black}
-        value={userName}
-        onChange={handleUserNameChange}
-        type="number"
-      />
-            {userError ? <Text style={{ color: 'red' }}>{userError}</Text> : null}
+          <TextInputComponent
+            backgroundColor={theme.white}
+            height={50}
+            radius={16}
+            placeholder="Mobile Number"
+            placeholderTextColor={theme.black}
+            textColor={theme.black}
+            value={userName}
+            onChange={handleUserNameChange}
+            type="number"
+          />
+          {userError ? <Text style={{color: 'red'}}>{userError}</Text> : null}
           <TextInputComponent
             backgroundColor={theme.white}
             height={50}
@@ -206,14 +230,18 @@ const StartScreen = () => {
             onChange={handlePasswordChange}
             type="password"
           />
-          {passwordError ? <Text style={{ color: 'red'}}>{passwordError}</Text> : null}
+          {passwordError ? (
+            <Text style={{color: 'red'}}>{passwordError}</Text>
+          ) : null}
           <Text style={styles.agreeText}>
             By continuing, I agree to the Terms of Use & Privacy Policy
           </Text>
           <View style={styles.loginBtn}>
             <ButtonFieldComponent onPress={() => handleLogin()} />
           </View>
-          <Text style={styles.forgetPassword}> Forgot password? Get help</Text>
+          <Text style={styles.forgetPassword}>
+            Forgot password? Get help
+          </Text>
         </View>
       </>
     );
@@ -241,6 +269,31 @@ const StartScreen = () => {
               ? _signup_section()
               : _login_section()}
           </View>
+
+          {/* Modal Popup for Contact Now */}
+          <Modal
+            transparent
+            visible={showContactModal}
+            animationType="slide"
+            onRequestClose={() => setShowContactModal(false)}>
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalMessage}>
+                  Sorry, currently no orphanages in your area!{'\n\n'}Family365 will connect with an orphanage manually.
+                </Text>
+                <TouchableOpacity
+                  style={styles.contactButton}
+                  onPress={handleContactNow}>
+                  <Text style={styles.contactButtonText}>Contact Now</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setShowContactModal(false)}>
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </ImageBackgroundProvider>
       </KeyboardAvoidingProvider>
     </ContainerProvider>
@@ -274,8 +327,8 @@ const styles = StyleSheet.create({
     minHeight: 200,
   },
   logoImage: {
-    width: 120,
-    height: 78,
+    width: 150,
+    height: 80,
   },
   tabSection: {
     flex: 1,
@@ -320,5 +373,53 @@ const styles = StyleSheet.create({
     minHeight: 300,
     rowGap: 18,
     marginTop: 30,
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalMessage: {
+    marginBottom: 20,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#000',
+  },
+  contactButton: {
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  contactButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#007BFF',
+    width: '100%',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#007BFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

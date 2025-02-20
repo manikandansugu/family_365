@@ -33,10 +33,11 @@ import { useTabBarVisibility } from '../context/TabBarVisibilityContext';
 import { resetState } from '../redux/slices/dataSlice';
 import {useDispatch,} from 'react-redux';
 import axios from 'axios';
+import {useToaster} from '../components/providers/ToasterProvider';
 
 const data = [
-  require('../assets/images/boyWithFlag.jpg'),
-  require('../assets/images/pot.jpg'),
+  require('../assets/images/act-1.png'),
+  require('../assets/images/act-2.png'),
 ];
 
 const data1 = [
@@ -46,6 +47,7 @@ const data1 = [
 
 const HomeScreen = () => {
   const { user, setUser } = useAuthState() ?? {};
+    const {showToast} = useToaster();
   console.log('uuseer, ', user)
     const [orphanageDetails, setOrphanageDetails] = useState([]);
   const { setTabBarVisible } = useTabBarVisibility();
@@ -68,7 +70,15 @@ const HomeScreen = () => {
       const response1 = await API_INSTANCE.get(
         `v1/admin/filter-orphanage-by-algorithm?pincode=${user?.pincode}&type=${user?.interestIn}`
       )
-      setUser({...response?.data?.data, orphanageId: response1?.data?.data?.orphanageId});
+      setUser({...response?.data?.data, orphanageId: response1?.data?.data?.orphanageId, mobileNo: response1?.data?.data?.mobileNo});
+      if(user?.regStatus === 'pending') {
+        showToast({
+          message: 'Payment is being verified, please wait...',
+          duration: 5000,
+          status: 'warning',
+          slideFrom: 'right',
+        });
+      };
       setOrphanageDetails(response1?.data?.data)
       console.log('ress', response1?.data?.data)
       const orphanageId = response1?.data?.data?.orphanageId;
@@ -130,10 +140,10 @@ const HomeScreen = () => {
       >
       
         <View style={styles.pendingContainer}>
-          <Image source={require('../assets/images/load.png')} style={styles.logoImage} />
+          <Image source={require('../assets/images/waiting.png')} style={styles.logoImage} />
           <Text style={styles.pendingText}>
-            We’re verifying your payment. This may take a moment.
-            You will be notified via email once the verification is complete.
+          Your payment is currently being verified. This may take a moment.
+          You will receive an email notification once the verification process is complete.
           </Text>
           <CustomButtonField
             buttonText="Check Verification Status"
@@ -161,7 +171,7 @@ const HomeScreen = () => {
                     }}>
                     <Text style={{ color: COLOR.black, fontSize: 14 }}>Logout</Text>
                   </Pressable>
-                  <Text style={{ color: COLOR.black, fontSize: 14 }}>Family 365</Text>
+                  <Text style={{ color: COLOR.black, fontSize: 14 }}>Family365</Text>
                 </View>
       </ContainerProvider>
     );
@@ -181,19 +191,19 @@ const HomeScreen = () => {
               source={require("../assets/images/banana.png")}
               style={styles.firstSecImage}
             />{" "}
-            {`Food,\n 365 days of happiness`}
+            {`Food\n365 Days of Happiness`}
           </Text>
           <Text style={styles.description}>
           World is One Family
             {/* Pledge a day's meal. Together, as a family, we can provide 365 days
             of nourishment. */}
           </Text>
-          <TouchableOpacity style={styles.button}>
+          {/* <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>Sponsor Now</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <Image
-          source={require("../assets/images/boy.png")}
+          source={require("../assets/images/banner.png")}
           style={styles.image}
         />
       </GradiantProvider>
@@ -202,28 +212,31 @@ const HomeScreen = () => {
 
   return (
     <ContainerProvider
-      headerProps={{type: 2, headerTitle: `Hello,${user?.firstName}`}}>
+      headerProps={{type: 2, headerTitle: `Hello, ${user?.firstName}`}}>
       <ScrollView style={{flex: 1, height: '100%'}}>
         <View style={styles.innerMainContainer}>
           {/* firstSection */}
           <View style={styles.firstSecContainer}>{_firstSection()}</View>
           {/* ///section two */}
           <View style={styles.secTwoContainer}>
-            <View style={styles.sectionTwoInnerContainer}>
+          <TouchableOpacity     activeOpacity={0.8}
+      onPress={() => navigation.navigate('activitiesScreen')}
+      style={styles.sectionTwoInnerContainer}>
+            {/* <View style={styles.sectionTwoInnerContainer}> */}
               <ImageSlider
                 data={data}
                 containerWidth={168}
-                containerHeight={141}
+                containerHeight={155}
                 imageContainerStyle={{
                   flex: 1,
                   width: 168,
-                  height: 141,
+                  height: 155,
                   borderRadius: 20,
                 }}
-                imageStyle={{width: 168, height: 141, borderRadius: 20}}
+                imageStyle={{width: 168, height: 155, borderRadius: 20}}
               />
 
-              <View
+              {/* <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-around',
@@ -232,24 +245,27 @@ const HomeScreen = () => {
                   paddingTop: 10,
                   position: 'absolute',
                   height: '100%',
-                }}>
-                <CustomButtonField
+                }}> */}
+                {/* <CustomButtonField
                   buttonText="Activities >"
                   onPress={() => {navigation.navigate('activitiesScreen', {orphanageDetails})}}
                   style={[styles.ActivitiesBtn, {width: 100}]}
                   textColor={theme.white}
                   textStyle={styles.btnText}
                   opacity={0.8}
-                />
-                <CalenderColorIcon />
-              </View>
-              <Text style={styles.sec2BtnSec}>
+                /> */}
+                {/* <CalenderColorIcon /> */}
+              {/* </View> */}
+              {/* <Text style={styles.sec2BtnSec}>
                 Independence Day Celebration at Bright Future Home
-              </Text>
-            </View>
-            <View style={styles.blueSection}>
+              </Text> */}
+            </TouchableOpacity>
+            <TouchableOpacity     activeOpacity={0.8}
+      onPress={() => navigation.navigate('sponserScreen')}
+      style={styles.blueSection}>
+            {/* <View style={styles.blueSection}> */}
               <CustomButtonField
-                buttonText="Sponsor >"
+                buttonText="Sponsors"
                 onPress={() => {navigation.navigate('sponserScreen')}}
                 style={[styles.ActivitiesBtn, {width: 90, marginLeft: 8}]}
                 textColor={theme.white}
@@ -257,8 +273,7 @@ const HomeScreen = () => {
                 opacity={0.8}
               />
               <Text style={styles.blueSectionText}>
-                Mr Kumaraswamy has contributed full day meals to Bright Future
-                Home.
+              "Together, We Are {'\n'}Making a Positive Impact"
               </Text>
               <BadgeView
                 icon={<HeandHeartIcon />}
@@ -266,9 +281,9 @@ const HomeScreen = () => {
                 style={styles.blueBadgeContainer}
                 textStyle={styles.blueBadgeText}
               />
+                  </TouchableOpacity>
             </View>
-          </View>
-
+      
           {/* third section */}
           <View style={styles.thirdSectionContainer}>
             <View style={styles.thirdSectionInner}>
@@ -279,8 +294,8 @@ const HomeScreen = () => {
       rowGap: 16, // Adds 16px vertical space between each child
     }}>
               <CustomButtonField
-                buttonText="Home Details >"
-                onPress={() => {}}
+                buttonText="Home Details"
+                onPress={() => {  navigation.navigate('orphanageScreen', {OrphanageDetails : [orphanageDetails]})}}
                 style={[styles.ActivitiesBtn, {width: 120, marginLeft: 8}]}
                 textColor={theme.white}
                 textStyle={styles.btnText}
@@ -289,14 +304,14 @@ const HomeScreen = () => {
 <BadgeView
   icon={
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Image
+      {/* <Image
         source={
           logoUri
             ? { uri: logoUri }
             : require('../assets/images/section1.png')
         }
         style={styles.section1Image}
-      />
+      /> */}
     </View>
   }
   titleText={orphanageDetails?.name}
@@ -326,7 +341,7 @@ const HomeScreen = () => {
                   </Text>
                 </View>
 
-                <View style={{flexDirection: 'row', columnGap: 3}}>
+                {/* <View style={{flexDirection: 'row', columnGap: 3}}>
                   <FlagIcon />
                   <Text
                     style={{
@@ -346,9 +361,9 @@ const HomeScreen = () => {
                     </Text>{' '}
                    {orphanageDetails?.mission}
                   </Text>
-                </View>
+                </View> */}
 
-                <CustomButtonField
+                {/* <CustomButtonField
                   buttonText="More Details"
                   onPress={() => {}}
                   opacity={0.8}
@@ -362,14 +377,24 @@ const HomeScreen = () => {
                     marginTop: 16,
                   }}
                   textColor={theme.white}
-                />
+                /> */}
               </View>
               </ScrollView>
             </View>
 
             {/* "right" */}
             <View style={{flex: 1, rowGap: 16}}>
-              <View
+            <TouchableOpacity     activeOpacity={0.8}
+      onPress={() => navigation.navigate('needScreen')}
+      style={{
+        backgroundColor: '#F4C4F3',
+        flex: 0.6,
+        borderRadius: 20,
+        justifyContent: 'center',
+        rowGap: 12,
+        alignItems: 'center',
+      }}>
+              {/* <View
                 style={{
                   backgroundColor: '#F4C4F3',
                   flex: 0.6,
@@ -377,9 +402,9 @@ const HomeScreen = () => {
                   justifyContent: 'center',
                   rowGap: 12,
                   alignItems: 'center',
-                }}>
+                }}> */}
                 <CustomButtonField
-                  buttonText="Needs >"
+                  buttonText="Needs"
                   onPress={() => {navigation.navigate('needScreen')}}
                   style={[
                     styles.ActivitiesBtn,
@@ -400,8 +425,8 @@ const HomeScreen = () => {
                     width: 150,
                     fontSize: 13,
                     fontWeight: 400,
-                  }}>
-                  The list of requirements for Bright Future Home:
+                  }}>"No matter the size, every contribution brings hope"
+                  {/* The list of requirements : */}
                 </Text>
                 <ImageSlider
                   data={data1}
@@ -419,12 +444,14 @@ const HomeScreen = () => {
                     borderRadius: 20,
                   }}
                 />
-              </View>
+              </TouchableOpacity>
 
               {/* bottom  */}
-              <View style={styles.yellowContainer}>
+              <TouchableOpacity     activeOpacity={0.8}
+      onPress={() => navigation.navigate('galleryScreen')}
+      style={styles.yellowContainer}>
                 <CustomButtonField
-                  buttonText="Gallery >"
+                  buttonText="Gallery"
                   onPress={() => {navigation.navigate('galleryScreen')}}
                   style={[
                     styles.ActivitiesBtn,
@@ -434,21 +461,33 @@ const HomeScreen = () => {
                   textStyle={styles.btnText}
                   opacity={0.8}
                 />
-                <View style={{flex: 1, position: 'relative', top: 8, left: 10}}>
-                  <View style={{position: 'absolute'}}>
-                    <AvatarViewComponent imageData="https://sfrbucket.s3.ap-south-1.amazonaws.com/Kunal.jpeg" />
-                  </View>
-                  <View style={{position: 'absolute', left: 20}}>
-                    <AvatarViewComponent imageData="https://sfrbucket.s3.ap-south-1.amazonaws.com/Kunal.jpeg" />
-                  </View>
-                  <View style={{position: 'absolute', left: 40}}>
-                    <AvatarViewComponent imageData="https://images.unsplash.com/photo-1494790108377-be9c29b29330?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D" />
-                  </View>
-                  <View style={{position: 'absolute', right: 25, top: 10}}>
-                    <Text style={{fontSize: 14, fontWeight: 500}}>+24 Img</Text>
-                  </View>
-                </View>
-              </View>
+                  <View style={styles.container}>
+      {/* First Avatar with no negative margin */}
+      <View style={[styles.avatarWrapper, { marginLeft: 0 }]}>
+        <AvatarViewComponent
+          imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g1.png"
+          imageStyle={styles.avatarImage}
+        />
+      </View>
+      {/* Subsequent avatars */}
+      <View style={styles.avatarWrapper}>
+        <AvatarViewComponent
+          imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g2.png"
+          imageStyle={styles.avatarImage}
+        />
+      </View>
+      <View style={styles.avatarWrapper}>
+        <AvatarViewComponent
+          imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g3.png"
+          imageStyle={styles.avatarImage}
+        />
+      </View>
+      {/* "+24 Img" Text */}
+      <View style={styles.moreWrapper}>
+        <Text style={styles.moreText}>+24 Img</Text>
+      </View>
+    </View>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -466,6 +505,40 @@ const styles = StyleSheet.create({
     rowGap: 16,
     marginVertical: 16,
   },
+  container: {
+    flexDirection: 'row',
+    // alignItems: 'center',
+    paddingLeft: 1,
+    paddingBottom: 40
+  },
+  avatarWrapper: {
+    // For overlapping effect, except for the first avatar
+    marginLeft: -20,
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40, // half of width/height for a circle
+    resizeMode: 'cover',
+    // borderWidth: 2,   // Optional: Add a border to better see the overlapping effect
+    // borderColor: '#fff',
+  },
+  moreWrapper: {
+    // Ensure the text appears after the avatars.
+    marginLeft: 20,
+    // backgroundColor: '#fff', // optional background for contrast
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    paddingTop: 30,
+    position: 'relative',
+    zIndex: 1,
+  },
+  moreText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#000',
+  },
   pendingContainer: {
     flex: 1,
     justifyContent: "center",
@@ -473,8 +546,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   logoImage: {
-    width: 100,
-    height: 100,
+    width: 130,
+    height: 130,
   },
   pendingText: {
     fontSize: 16,
@@ -538,8 +611,10 @@ const styles = StyleSheet.create({
     color: theme.white,
   },  
   description: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: 600,
     color: '#555',
+    marginTop: 25
   },
   button: {
     backgroundColor: '#000',
@@ -555,8 +630,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   image: {
-    height: '100%',
-    borderRadius: 10,
+    // height: '100%',
+    // maxHeight: 0,
+    // borderRadius: 10,
+    paddingTop: 10
   },
   firstSecImage: {
     height: 20,
@@ -592,6 +669,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     columnGap: 16,
+    borderRadius: 20,
   },
   sectionTwoInnerContainer: {
     flex: 1,
@@ -656,6 +734,7 @@ badgeTextGreen: {
   color: COLOR.black,
   fontSize: 12,
   fontWeight: '500',
+  paddingLeft: 10,
   maxWidth: 120,  // ✅ Restrict max width
   overflow: 'hidden', // ✅ Prevent text overflow
   textOverflow: 'ellipsis', // ✅ Show '...' if needed (works with web)
@@ -667,8 +746,8 @@ thirdSectionBadge: {
   borderRadius: 20,
   // paddingHorizontal: 8,
   height: 35,
-  marginHorizontal: 4,
-  width: 170, // ✅ Ensure the badge has enough space
+  marginHorizontal: 8,
+  width: 160, // ✅ Ensure the badge has enough space
 },
 
   yellowContainer: {

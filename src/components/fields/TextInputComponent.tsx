@@ -10,6 +10,7 @@ const TextInputComponent = (props: TextInputFieldInterface) => {
     placeholderTextColor,
     backgroundColor,
     height,
+    width,
     radius,
     textColor,
     onChange,
@@ -36,7 +37,7 @@ const TextInputComponent = (props: TextInputFieldInterface) => {
       <TextInput
         style={[
           { backgroundColor: editable ? backgroundColor : '#f0f0f0' }, // 🔹 Light gray if disabled
-          { height: height, borderRadius: radius, color: editable ? textColor : '#a0a0a0' }, // 🔹 Gray text if disabled
+          { height: height, borderRadius: radius, color: editable ? textColor : '#a0a0a0', width: width }, // 🔹 Gray text if disabled
           { paddingRight: type === 'upload' ? 100 : null },
           styles.textField,
           !editable && styles.disabledField, // 🔹 Reduced opacity if disabled
