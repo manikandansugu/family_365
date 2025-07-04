@@ -6,10 +6,8 @@ import {theme} from '../../utils/theme';
 import moment from 'moment';
 import {AppDispatch, RootState} from '../../redux/store';
 import {useDispatch, useSelector} from 'react-redux';
-import {memberData} from '../../redux/slices/authSlice';
 
 import DatePicker from 'react-native-date-picker';
-import TextInputComponent from '../fields/TextInputComponent';
 export type TInputParams = {
   memberId: string;
   totalPaymentMade: string | undefined;
@@ -63,13 +61,13 @@ const AddNumberOfDaysView = ({
     }
   };
 
-  const DatePickerComponent = ({ index }: { index: number }) => {
+  const DatePickerComponent = ({index}: {index: number}) => {
     const [date, setDate] = useState(new Date());
-  
+
     const currentYear = new Date().getFullYear();
     const minDate = new Date(); // ✅ Today’s date (No past dates)
-    const maxDate = new Date(currentYear, 11, 31); // ✅ December 31st of this year
-  
+    const maxDate = new Date(currentYear + 1, 11, 31); // ✅ December 31st of this year
+
     return (
       <>
         {localInput?.at(index)?.memberNameBookedDob && (
@@ -97,7 +95,8 @@ const AddNumberOfDaysView = ({
                   return {
                     ...itm,
                     isVisible: false,
-                    memberNameBookedDob: date && moment(date).format('DD/MMM/YYYY'),
+                    memberNameBookedDob:
+                      date && moment(date).format('DD/MMM/YYYY'),
                   };
                 }
                 return itm;
@@ -166,7 +165,7 @@ const AddNumberOfDaysView = ({
           </Pressable>
           <View style={[styles.bottomRight]}>
             <TextInput
-              placeholder="Enter Reason for Sponsorship"
+              placeholder="Occasion for This Donation"
               placeholderTextColor={theme.black}
               value={localInput?.at(index)?.memberBookedDescription}
               onChangeText={text => {
@@ -208,7 +207,7 @@ const AddNumberOfDaysView = ({
         </View>
         {/* <View style={styles.horizontalScreen} /> */}
         <View style={styles.bottomSection}>
-        <View style={[styles.bottomRight1]}>
+          <View style={[styles.bottomRight1]}>
             <Text
               style={[
                 styles.bottomRight,
@@ -219,12 +218,13 @@ const AddNumberOfDaysView = ({
                   fontSize: 15,
                   color: theme.white,
                   fontWeight: 500,
-                  borderWidth:  0,
+                  borderWidth: 0,
                   borderColor: 'transparent',
-                  backgroundColor:  'transparent',
+                  backgroundColor: 'transparent',
                 },
-              ]}
-            >Name</Text>
+              ]}>
+              Name
+            </Text>
           </View>
           <View style={[styles.bottomRight]}>
             <TextInput
@@ -254,9 +254,7 @@ const AddNumberOfDaysView = ({
                   fontWeight: 500,
                 },
                 {
-                  borderWidth: localInput?.at(index)?.isNameError
-                    ? 1
-                    : 0,
+                  borderWidth: localInput?.at(index)?.isNameError ? 1 : 0,
                   borderColor: localInput?.at(index)?.isNameError
                     ? COLOR.bgRed
                     : 'transparent',

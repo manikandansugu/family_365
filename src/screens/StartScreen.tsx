@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Linking,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ImageBackgroundProvider from '../components/providers/BackgroundGradiantProvider';
@@ -37,7 +38,9 @@ const StartScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<any>();
 
-  const [selectedTabText, setSelectedTabText] = useState<string>(AuthText.signup);
+  const [selectedTabText, setSelectedTabText] = useState<string>(
+    AuthText.signup,
+  );
   const [selectedParticipation, setSelectedRadioText] = useState<string>();
   const [areaPincode, setAreaPincode] = useState<string>();
   const [userName, setUserName] = useState<string>();
@@ -106,8 +109,7 @@ const StartScreen = () => {
     } catch (error: any) {
       showToast({
         message:
-          error?.response?.data?.description ??
-          error?.response?.data?.message,
+          error?.response?.data?.description ?? error?.response?.data?.message,
         duration: 5000,
         status: 'error',
         slideFrom: 'right',
@@ -135,7 +137,10 @@ const StartScreen = () => {
       }
     } catch (error: any) {
       setLoading(false);
-      console.log('Error in HandleParticipate:', error?.response?.data?.message);
+      console.log(
+        'Error in HandleParticipate:',
+        error?.response?.data?.message,
+      );
       if (
         error?.response?.data?.message ===
         'No Matching Orphanage found , please contact administrator'
@@ -156,9 +161,10 @@ const StartScreen = () => {
   const handleContactNow = () => {
     // Implement your contact logic here.
     // For example, navigate to a Contact screen:
-    navigation.navigate('ContactScreen');
+    // navigation.navigate('ContactScreen');
     // Hide the modal after pressing the button.
     setShowContactModal(false);
+    Linking.openURL(`tel:${919841826925}`);
   };
 
   useEffect(() => {
@@ -239,9 +245,7 @@ const StartScreen = () => {
           <View style={styles.loginBtn}>
             <ButtonFieldComponent onPress={() => handleLogin()} />
           </View>
-          <Text style={styles.forgetPassword}>
-            Forgot password? Get help
-          </Text>
+          <Text style={styles.forgetPassword}>Forgot password? Get help</Text>
         </View>
       </>
     );
@@ -279,7 +283,8 @@ const StartScreen = () => {
             <View style={styles.modalOverlay}>
               <View style={styles.modalContainer}>
                 <Text style={styles.modalMessage}>
-                  Sorry, currently no orphanages in your area!{'\n\n'}Family365 will connect with an orphanage manually.
+                  Sorry, currently no orphanages in your area!{'\n\n'}Family365
+                  will connect with an orphanage manually.
                 </Text>
                 <TouchableOpacity
                   style={styles.contactButton}

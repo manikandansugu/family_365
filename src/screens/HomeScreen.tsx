@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState, useCallback } from 'react';
-import { Buffer } from 'buffer';
+import React, {useEffect, useState, useCallback} from 'react';
+import {Buffer} from 'buffer';
 import {useNavigation} from '@react-navigation/native';
 import ContainerProvider from '../components/providers/ContainerProvider';
 import GradiantProvider from '../components/providers/GradiantProvider';
@@ -18,21 +18,13 @@ import CustomButtonField from '../components/fields/CustomButtonField';
 import {theme} from '../utils/theme';
 import ImageSlider from '../components/view/ImageSliderView';
 import BadgeView from '../components/view/BadgeView';
-import {
-  CalenderColorIcon,
-  ColorHomeIcon,
-  FlagIcon,
-  GroupIcon,
-  HeandHeartIcon,
-  LocationIcon,
-} from '../assets/svg';
+import {GroupIcon, HeandHeartIcon, LocationIcon} from '../assets/svg';
 import AvatarViewComponent from '../components/view/AvatarViewComponent';
 import {useAuthState} from '../context/AuthContext';
 import API_INSTANCE from '../config/apiClient';
-import { useTabBarVisibility } from '../context/TabBarVisibilityContext';
-import { resetState } from '../redux/slices/dataSlice';
-import {useDispatch,} from 'react-redux';
-import axios from 'axios';
+import {useTabBarVisibility} from '../context/TabBarVisibilityContext';
+import {resetState} from '../redux/slices/dataSlice';
+import {useDispatch} from 'react-redux';
 import {useToaster} from '../components/providers/ToasterProvider';
 
 const data = [
@@ -46,18 +38,17 @@ const data1 = [
 ];
 
 const HomeScreen = () => {
-  const { user, setUser } = useAuthState() ?? {};
-    const {showToast} = useToaster();
-  console.log('uuseer, ', user)
-    const [orphanageDetails, setOrphanageDetails] = useState([]);
-  const { setTabBarVisible } = useTabBarVisibility();
-    const [logoUri, setLogoUri] = useState<string | null>(null);
+  const {user, setUser} = useAuthState() ?? {};
+  const {showToast} = useToaster();
+  const [orphanageDetails, setOrphanageDetails] = useState([]);
+  const {setTabBarVisible} = useTabBarVisibility();
+  const [logoUri, setLogoUri] = useState<string | null>(null);
   const navigation = useNavigation<any>();
   const dispatch = useDispatch<AppDispatch>();
   // const [memberDetails, setMemberDetails] = useState(null); // Store API response
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
-  console.log('api', user)
+  console.log('api', user);
   // console.log('memberDetails', memberDetails)
 
   const fetchMemberDetails = useCallback(async () => {
@@ -65,39 +56,45 @@ const HomeScreen = () => {
       setIsLoading(true);
       setError(null);
       const response = await API_INSTANCE.get(
-        `v1/family-member/fetch-member-details-by-mobilenumber?mobileNumber=${user?.mobileNumber}`
+        `v1/family-member/fetch-member-details-by-mobilenumber?mobileNumber=${user?.mobileNumber}`,
       );
       const response1 = await API_INSTANCE.get(
-        `v1/admin/filter-orphanage-by-algorithm?pincode=${user?.pincode}&type=${user?.interestIn}`
-      )
-      setUser({...response?.data?.data, orphanageId: response1?.data?.data?.orphanageId, mobileNo: response1?.data?.data?.mobileNo});
-      if(user?.regStatus === 'pending') {
+        `v1/admin/filter-orphanage-by-algorithm?pincode=${user?.pincode}&type=${user?.interestIn}`,
+      );
+      setUser({
+        ...response?.data?.data,
+        orphanageId: response1?.data?.data?.orphanageId,
+        mobileNo: response1?.data?.data?.mobileNo,
+      });
+      if (user?.regStatus === 'pending') {
         showToast({
           message: 'Payment is being verified, please wait...',
           duration: 5000,
           status: 'warning',
           slideFrom: 'right',
         });
-      };
-      setOrphanageDetails(response1?.data?.data)
-      console.log('ress', response1?.data?.data)
+      }
+      setOrphanageDetails(response1?.data?.data);
+      console.log('ress', response1?.data?.data);
       const orphanageId = response1?.data?.data?.orphanageId;
-      console.log(`ooooo ${orphanageId}`)
-      const response2 = await API_INSTANCE.get(`v1/storage/fetch-logo-for-orphanage`,
+      console.log(`ooooo ${orphanageId}`);
+      const response2 = await API_INSTANCE.get(
+        `v1/storage/fetch-logo-for-orphanage`,
         {
-          params: { orphanageId },
+          params: {orphanageId},
           responseType: 'arraybuffer', // Ensure binary data is fetched
-        }
+        },
       );
 
       // Convert binary data to Base64
-      const base64Image = `data:image/png;base64,${Buffer.from(response2.data, 'binary').toString(
-        'base64'
-      )}`;
+      const base64Image = `data:image/png;base64,${Buffer.from(
+        response2.data,
+        'binary',
+      ).toString('base64')}`;
       setLogoUri(base64Image);
     } catch (err: any) {
-      console.error("Error fetching member details:", err);
-      setError("Failed to load member details");
+      console.error('Error fetching member details:', err);
+      setError('Failed to load member details');
     } finally {
       setIsLoading(false);
     }
@@ -132,18 +129,20 @@ const HomeScreen = () => {
   }
 
   // Check registration status
-  if (user?.regStatus === "pending") {
+  if (user?.regStatus === 'pending') {
     setTabBarVisible(false);
     return (
       <ContainerProvider
-        headerProps={{ type: 2, headerTitle: `Hello, ${user?.firstName}`}}
-      >
-      
+        headerProps={{type: 2, headerTitle: `Hello, ${user?.firstName}`}}>
         <View style={styles.pendingContainer}>
-          <Image source={require('../assets/images/waiting.png')} style={styles.logoImage} />
+          <Image
+            source={require('../assets/images/waiting.png')}
+            style={styles.logoImage}
+          />
           <Text style={styles.pendingText}>
-          Your payment is currently being verified. This may take a moment.
-          You will receive an email notification once the verification process is complete.
+            Your payment is currently being verified. This may take a moment.
+            You will receive an email notification once the verification process
+            is complete.
           </Text>
           <CustomButtonField
             buttonText="Check Verification Status"
@@ -154,47 +153,47 @@ const HomeScreen = () => {
             opacity={0.8}
           />
         </View>
-              <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center' }}>
-                  <Pressable
-                    onPress={() => {
-                      dispatch(resetState());
-                      setUser(null);
-                    }}
-                    style={{
-                      height: 30,
-                      borderWidth: 1,
-                      borderColor: COLOR.black,
-                      paddingHorizontal: 20,
-                      justifyContent: 'center',
-                      marginBottom: 10,
-                      borderRadius: 16,
-                    }}>
-                    <Text style={{ color: COLOR.black, fontSize: 14 }}>Logout</Text>
-                  </Pressable>
-                  <Text style={{ color: COLOR.black, fontSize: 14 }}>Family365</Text>
-                </View>
+        <View
+          style={{flex: 0.2, justifyContent: 'center', alignItems: 'center'}}>
+          <Pressable
+            onPress={() => {
+              dispatch(resetState());
+              setUser(null);
+            }}
+            style={{
+              height: 30,
+              borderWidth: 1,
+              borderColor: COLOR.black,
+              paddingHorizontal: 20,
+              justifyContent: 'center',
+              marginBottom: 10,
+              borderRadius: 16,
+            }}>
+            <Text style={{color: COLOR.black, fontSize: 14}}>Logout</Text>
+          </Pressable>
+          <Text style={{color: COLOR.black, fontSize: 14}}>Family365</Text>
+        </View>
       </ContainerProvider>
     );
-  }else  setTabBarVisible(true);
+  } else setTabBarVisible(true);
 
   // Render the main screen if registration status is not pending
   const _firstSection = () => {
     return (
       <GradiantProvider
         style={styles.cardContainer}
-        colors={["#FFBD59", "#F6B2AF"]}
-      >
+        colors={['#FFBD59', '#F6B2AF']}>
         <View style={styles.content}>
           <Text style={styles.title}>
-            365 Days Of{" "}
+            365 Days Of{' '}
             <Image
-              source={require("../assets/images/banana.png")}
+              source={require('../assets/images/banana.png')}
               style={styles.firstSecImage}
-            />{" "}
+            />{' '}
             {`Food\n365 Days of Happiness`}
           </Text>
           <Text style={styles.description}>
-          World is One Family
+            World is One Family
             {/* Pledge a day's meal. Together, as a family, we can provide 365 days
             of nourishment. */}
           </Text>
@@ -203,7 +202,7 @@ const HomeScreen = () => {
           </TouchableOpacity> */}
         </View>
         <Image
-          source={require("../assets/images/banner.png")}
+          source={require('../assets/images/banner.png')}
           style={styles.image}
         />
       </GradiantProvider>
@@ -219,10 +218,11 @@ const HomeScreen = () => {
           <View style={styles.firstSecContainer}>{_firstSection()}</View>
           {/* ///section two */}
           <View style={styles.secTwoContainer}>
-          <TouchableOpacity     activeOpacity={0.8}
-      onPress={() => navigation.navigate('activitiesScreen')}
-      style={styles.sectionTwoInnerContainer}>
-            {/* <View style={styles.sectionTwoInnerContainer}> */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('activitiesScreen')}
+              style={styles.sectionTwoInnerContainer}>
+              {/* <View style={styles.sectionTwoInnerContainer}> */}
               <ImageSlider
                 data={data}
                 containerWidth={168}
@@ -246,7 +246,7 @@ const HomeScreen = () => {
                   position: 'absolute',
                   height: '100%',
                 }}> */}
-                {/* <CustomButtonField
+              {/* <CustomButtonField
                   buttonText="Activities >"
                   onPress={() => {navigation.navigate('activitiesScreen', {orphanageDetails})}}
                   style={[styles.ActivitiesBtn, {width: 100}]}
@@ -254,26 +254,29 @@ const HomeScreen = () => {
                   textStyle={styles.btnText}
                   opacity={0.8}
                 /> */}
-                {/* <CalenderColorIcon /> */}
+              {/* <CalenderColorIcon /> */}
               {/* </View> */}
               {/* <Text style={styles.sec2BtnSec}>
                 Independence Day Celebration at Bright Future Home
               </Text> */}
             </TouchableOpacity>
-            <TouchableOpacity     activeOpacity={0.8}
-      onPress={() => navigation.navigate('sponserScreen')}
-      style={styles.blueSection}>
-            {/* <View style={styles.blueSection}> */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('sponserScreen')}
+              style={styles.blueSection}>
+              {/* <View style={styles.blueSection}> */}
               <CustomButtonField
                 buttonText="Sponsors"
-                onPress={() => {navigation.navigate('sponserScreen')}}
+                onPress={() => {
+                  navigation.navigate('sponserScreen');
+                }}
                 style={[styles.ActivitiesBtn, {width: 90, marginLeft: 8}]}
                 textColor={theme.white}
                 textStyle={styles.btnText}
                 opacity={0.8}
               />
               <Text style={styles.blueSectionText}>
-              "Together, We Are {'\n'}Making a Positive Impact"
+                "Together, We Are {'\n'}Making a Positive Impact"
               </Text>
               <BadgeView
                 icon={<HeandHeartIcon />}
@@ -281,30 +284,35 @@ const HomeScreen = () => {
                 style={styles.blueBadgeContainer}
                 textStyle={styles.blueBadgeText}
               />
-                  </TouchableOpacity>
-            </View>
-      
+            </TouchableOpacity>
+          </View>
+
           {/* third section */}
           <View style={styles.thirdSectionContainer}>
             <View style={styles.thirdSectionInner}>
-
-            <ScrollView style={{ flex: 1 }}  contentContainerStyle={{ 
-      paddingHorizontal: 1,
-      paddingVertical: 10,
-      rowGap: 16, // Adds 16px vertical space between each child
-    }}>
-              <CustomButtonField
-                buttonText="Home Details"
-                onPress={() => {  navigation.navigate('orphanageScreen', {OrphanageDetails : [orphanageDetails]})}}
-                style={[styles.ActivitiesBtn, {width: 120, marginLeft: 8}]}
-                textColor={theme.white}
-                textStyle={styles.btnText}
-                opacity={0.8}
-              />
-<BadgeView
-  icon={
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      {/* <Image
+              <ScrollView
+                style={{flex: 1}}
+                contentContainerStyle={{
+                  paddingHorizontal: 1,
+                  paddingVertical: 10,
+                  rowGap: 16, // Adds 16px vertical space between each child
+                }}>
+                <CustomButtonField
+                  buttonText="Home Details"
+                  onPress={() => {
+                    navigation.navigate('orphanageScreen', {
+                      OrphanageDetails: [orphanageDetails],
+                    });
+                  }}
+                  style={[styles.ActivitiesBtn, {width: 120, marginLeft: 8}]}
+                  textColor={theme.white}
+                  textStyle={styles.btnText}
+                  opacity={0.8}
+                />
+                <BadgeView
+                  icon={
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      {/* <Image
         source={
           logoUri
             ? { uri: logoUri }
@@ -312,36 +320,38 @@ const HomeScreen = () => {
         }
         style={styles.section1Image}
       /> */}
-    </View>
-  }
-  titleText={orphanageDetails?.name}
-  style={styles.thirdSectionBadge}
-  textStyle={styles.badgeTextGreen}
-/>
+                    </View>
+                  }
+                  titleText={orphanageDetails?.name}
+                  style={styles.thirdSectionBadge}
+                  textStyle={styles.badgeTextGreen}
+                />
 
+                <View
+                  style={{
+                    left: 10,
+                    width: '80%',
+                    rowGap: 4,
+                  }}>
+                  <View style={{flexDirection: 'row', columnGap: 3}}>
+                    <LocationIcon />
+                    <Text style={{color: COLOR.black, fontSize: 13}}>
+                      {orphanageDetails?.addressLine1}{' '}
+                      {orphanageDetails?.addressLine2}{' '}
+                      {orphanageDetails?.addressLine3} {orphanageDetails?.city}{' '}
+                      {orphanageDetails?.district} {orphanageDetails?.state}{' '}
+                      {orphanageDetails?.pincode}
+                    </Text>
+                  </View>
 
+                  <View style={{flexDirection: 'row', columnGap: 3}}>
+                    <GroupIcon />
+                    <Text style={{color: COLOR.black, fontSize: 13}}>
+                      Supported: 38
+                    </Text>
+                  </View>
 
-              <View
-                style={{
-                  left: 10,
-                  width: '80%',
-                  rowGap: 4,
-                }}>
-                <View style={{flexDirection: 'row', columnGap: 3}}>
-                  <LocationIcon />
-                  <Text style={{color: COLOR.black, fontSize: 13}}>
-                   {orphanageDetails?.addressLine1}{' '}{orphanageDetails?.addressLine2}{' '}{orphanageDetails?.addressLine3}{' '}{orphanageDetails?.city}{' '}{orphanageDetails?.district}{' '}{orphanageDetails?.state}{' '}{orphanageDetails?.pincode}
-                  </Text>
-                </View>
-
-                <View style={{flexDirection: 'row', columnGap: 3}}>
-                  <GroupIcon />
-                  <Text style={{color: COLOR.black, fontSize: 13}}>
-                    Supported: 38
-                  </Text>
-                </View>
-
-                {/* <View style={{flexDirection: 'row', columnGap: 3}}>
+                  {/* <View style={{flexDirection: 'row', columnGap: 3}}>
                   <FlagIcon />
                   <Text
                     style={{
@@ -363,7 +373,7 @@ const HomeScreen = () => {
                   </Text>
                 </View> */}
 
-                {/* <CustomButtonField
+                  {/* <CustomButtonField
                   buttonText="More Details"
                   onPress={() => {}}
                   opacity={0.8}
@@ -378,23 +388,24 @@ const HomeScreen = () => {
                   }}
                   textColor={theme.white}
                 /> */}
-              </View>
+                </View>
               </ScrollView>
             </View>
 
             {/* "right" */}
             <View style={{flex: 1, rowGap: 16}}>
-            <TouchableOpacity     activeOpacity={0.8}
-      onPress={() => navigation.navigate('needScreen')}
-      style={{
-        backgroundColor: '#F4C4F3',
-        flex: 0.6,
-        borderRadius: 20,
-        justifyContent: 'center',
-        rowGap: 12,
-        alignItems: 'center',
-      }}>
-              {/* <View
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('needScreen')}
+                style={{
+                  backgroundColor: '#F4C4F3',
+                  flex: 0.6,
+                  borderRadius: 20,
+                  justifyContent: 'center',
+                  rowGap: 12,
+                  alignItems: 'center',
+                }}>
+                {/* <View
                 style={{
                   backgroundColor: '#F4C4F3',
                   flex: 0.6,
@@ -405,7 +416,9 @@ const HomeScreen = () => {
                 }}> */}
                 <CustomButtonField
                   buttonText="Needs"
-                  onPress={() => {navigation.navigate('needScreen')}}
+                  onPress={() => {
+                    navigation.navigate('needScreen');
+                  }}
                   style={[
                     styles.ActivitiesBtn,
                     {
@@ -425,7 +438,8 @@ const HomeScreen = () => {
                     width: 150,
                     fontSize: 13,
                     fontWeight: 400,
-                  }}>"No matter the size, every contribution brings hope"
+                  }}>
+                  "No matter the size, every contribution brings hope"
                   {/* The list of requirements : */}
                 </Text>
                 <ImageSlider
@@ -447,12 +461,15 @@ const HomeScreen = () => {
               </TouchableOpacity>
 
               {/* bottom  */}
-              <TouchableOpacity     activeOpacity={0.8}
-      onPress={() => navigation.navigate('galleryScreen')}
-      style={styles.yellowContainer}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('galleryScreen')}
+                style={styles.yellowContainer}>
                 <CustomButtonField
                   buttonText="Gallery"
-                  onPress={() => {navigation.navigate('galleryScreen')}}
+                  onPress={() => {
+                    navigation.navigate('galleryScreen');
+                  }}
                   style={[
                     styles.ActivitiesBtn,
                     {width: 80, marginLeft: 8, marginTop: 8},
@@ -461,32 +478,32 @@ const HomeScreen = () => {
                   textStyle={styles.btnText}
                   opacity={0.8}
                 />
-                  <View style={styles.container}>
-      {/* First Avatar with no negative margin */}
-      <View style={[styles.avatarWrapper, { marginLeft: 0 }]}>
-        <AvatarViewComponent
-          imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g1.png"
-          imageStyle={styles.avatarImage}
-        />
-      </View>
-      {/* Subsequent avatars */}
-      <View style={styles.avatarWrapper}>
-        <AvatarViewComponent
-          imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g2.png"
-          imageStyle={styles.avatarImage}
-        />
-      </View>
-      <View style={styles.avatarWrapper}>
-        <AvatarViewComponent
-          imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g3.png"
-          imageStyle={styles.avatarImage}
-        />
-      </View>
-      {/* "+24 Img" Text */}
-      <View style={styles.moreWrapper}>
-        <Text style={styles.moreText}>+24 Img</Text>
-      </View>
-    </View>
+                <View style={styles.container}>
+                  {/* First Avatar with no negative margin */}
+                  <View style={[styles.avatarWrapper, {marginLeft: 0}]}>
+                    <AvatarViewComponent
+                      imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g1.png"
+                      imageStyle={styles.avatarImage}
+                    />
+                  </View>
+                  {/* Subsequent avatars */}
+                  <View style={styles.avatarWrapper}>
+                    <AvatarViewComponent
+                      imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g2.png"
+                      imageStyle={styles.avatarImage}
+                    />
+                  </View>
+                  <View style={styles.avatarWrapper}>
+                    <AvatarViewComponent
+                      imageData="https://imageuploadtestingbob.s3.us-east-2.amazonaws.com/dev/alpino/g3.png"
+                      imageStyle={styles.avatarImage}
+                    />
+                  </View>
+                  {/* "+24 Img" Text */}
+                  <View style={styles.moreWrapper}>
+                    <Text style={styles.moreText}>+24 Img</Text>
+                  </View>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
@@ -509,7 +526,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // alignItems: 'center',
     paddingLeft: 1,
-    paddingBottom: 40
+    paddingBottom: 40,
   },
   avatarWrapper: {
     // For overlapping effect, except for the first avatar
@@ -541,8 +558,8 @@ const styles = StyleSheet.create({
   },
   pendingContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 16,
   },
   logoImage: {
@@ -552,9 +569,9 @@ const styles = StyleSheet.create({
   pendingText: {
     fontSize: 16,
     color: COLOR.black,
-    textAlign: "center",
-    fontWeight: "600",
-    marginTop: 20
+    textAlign: 'center',
+    fontWeight: '600',
+    marginTop: 20,
   },
 
   logoSection: {
@@ -598,23 +615,23 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   checkButton: {
-    backgroundColor: COLOR.black, 
+    backgroundColor: COLOR.black,
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 20,
     marginTop: 50,
   },
-  
+
   checkButtonText: {
     fontSize: 14,
     fontWeight: '600',
     color: theme.white,
-  },  
+  },
   description: {
     fontSize: 16,
     fontWeight: 600,
     color: '#555',
-    marginTop: 25
+    marginTop: 25,
   },
   button: {
     backgroundColor: '#000',
@@ -633,7 +650,7 @@ const styles = StyleSheet.create({
     // height: '100%',
     // maxHeight: 0,
     // borderRadius: 10,
-    paddingTop: 10
+    paddingTop: 10,
   },
   firstSecImage: {
     height: 20,
@@ -730,25 +747,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     rowGap: 8,
   },
-badgeTextGreen: {
-  color: COLOR.black,
-  fontSize: 12,
-  fontWeight: '500',
-  paddingLeft: 10,
-  maxWidth: 120,  // ✅ Restrict max width
-  overflow: 'hidden', // ✅ Prevent text overflow
-  textOverflow: 'ellipsis', // ✅ Show '...' if needed (works with web)
-},
-thirdSectionBadge: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  backgroundColor: COLOR.white,
-  borderRadius: 20,
-  // paddingHorizontal: 8,
-  height: 35,
-  marginHorizontal: 8,
-  width: 160, // ✅ Ensure the badge has enough space
-},
+  badgeTextGreen: {
+    color: COLOR.black,
+    fontSize: 12,
+    fontWeight: '500',
+    paddingLeft: 10,
+    maxWidth: 120, // ✅ Restrict max width
+    overflow: 'hidden', // ✅ Prevent text overflow
+    textOverflow: 'ellipsis', // ✅ Show '...' if needed (works with web)
+  },
+  thirdSectionBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLOR.white,
+    borderRadius: 20,
+    // paddingHorizontal: 8,
+    height: 35,
+    marginHorizontal: 8,
+    width: 160, // ✅ Ensure the badge has enough space
+  },
 
   yellowContainer: {
     backgroundColor: '#FFD194',

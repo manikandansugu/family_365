@@ -1,6 +1,6 @@
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { emailRegex } from '../entities/entryObjects';
-import { LayoutAnimation } from 'react-native';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {emailRegex} from '../entities/entryObjects';
+import {LayoutAnimation} from 'react-native';
 
 export const OPEN_CAMERA = async (): Promise<any> => {
   const options: any = {
@@ -234,8 +234,7 @@ export const handleRegisterErrorValidate = (props: any) => {
           slideFrom: 'right',
         };
       }
-    }
-    else if (key === 'transactionId') {
+    } else if (key === 'transactionId') {
       if (!value) {
         payload = {
           message: 'Enter Transaction Id',
@@ -262,7 +261,7 @@ const verhoeffTableD = [
   [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
   [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
   [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
-  [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+  [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
 ];
 
 const verhoeffTableP = [
@@ -273,12 +272,11 @@ const verhoeffTableP = [
   [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
   [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
   [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
-  [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]
+  [7, 0, 4, 6, 9, 1, 3, 2, 5, 8],
 ];
 
 // The inverse table is used to find the inverse of a digit in Verhoeff's scheme.
 // const verhoeffTableInv = [0, 4, 3, 2, 1, 5, 6, 7, 8, 9];
-
 
 function validateAadhaar(aadhaar: string) {
   // 1. Must be exactly 12 digits
@@ -319,7 +317,6 @@ export const handleIdentityValidation = (props: any) => {
         };
       }
     } else if (key === 'aadhar') {
-      console.log(value)
       // if (!value) {
       //   payload = {
       //     message: 'Enter Aadhar Details',
@@ -359,8 +356,7 @@ export const handleIdentityValidation = (props: any) => {
           };
         }
       }
-    }
-    else if (key === 'blood') {
+    } else if (key === 'blood') {
       if (!value) {
         payload = {
           message: 'Enter blood group details',
@@ -409,7 +405,7 @@ export const validateBookings = (bookings: any) => {
       ...booking,
       isDescriptionError,
       isDobError,
-      isNameError
+      isNameError,
     };
   });
 };

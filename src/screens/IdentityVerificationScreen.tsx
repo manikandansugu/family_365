@@ -9,17 +9,17 @@ import {theme} from '../utils/theme';
 import RadioButtonComponent from '../components/fields/RadioButtonComponent';
 import CustomButtonField from '../components/fields/CustomButtonField';
 import {useNavigation} from '@react-navigation/native';
-import {useAuthState} from '../context/AuthContext';
-import {
-  handleIdentityValidation,
-  OPEN_CAMERA,
-  OPEN_GALLERY,
-} from '../utils/helpers';
 import {useToaster} from '../components/providers/ToasterProvider';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../redux/store';
 import TextFieldDropdown from '../components/fields/TextFieldDropdown';
 
+// type errorType = {
+//   message: string;
+//   duration: number;
+//   status: 'error' | 'success' | 'warning';
+//   slideFrom: 'right' | 'left';
+// };
 const IdentityVerificationScreen = () => {
   const {showToast} = useToaster();
   const navigation = useNavigation<any>();
@@ -29,9 +29,9 @@ const IdentityVerificationScreen = () => {
     (state: RootState) => state.orphanageDetails,
   );
   const {registerForm, memberData}: any = registerData ?? {};
-  console.log('registerForm',registerForm)
-  console.log('OrphanageDetails',OrphanageDetails)
-  console.log('memberData',memberData)
+  console.log('registerForm', registerForm);
+  console.log('OrphanageDetails', OrphanageDetails);
+  console.log('memberData', memberData);
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
   const [consentText, setConsentText] = useState<string[]>([
     'Agree',
@@ -46,7 +46,7 @@ const IdentityVerificationScreen = () => {
   const [blood, setBlood] = useState<string>('');
   const [profession, setProfession] = useState<string>();
   const [loading, setLoading] = useState(false);
-    const [hoveredIndex, setHoveredIndex] = useState<any | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<any | null>(null);
   useEffect(() => {
     if (hoveredIndex) {
       setBlood(hoveredIndex);
@@ -75,150 +75,169 @@ const IdentityVerificationScreen = () => {
   //       console.log('Error:', error.response?.data || error.message);
   //     }
   //   };
+  const validation = (org: any) => {
+    for (const [key, value] of Object.entries(org)) {
+      if (!value || value?.trim() === '') {
+        const payload = {
+          message: `Enter ${key} detail`,
+          duration: 3000,
+          status: 'error',
+          slideFrom: 'right',
+        };
+        return payload;
+      }
+    }
+    return true;
+  };
 
   const onProceed = async () => {
     // setLoading(true);
-    const error = handleIdentityValidation({
-      aadhar,
+    // const error = handleIdentityVFinalidation({
+    //   // aadhar,
+    //   pan,
+    //   blood,
+    //   profession,
+    //   // selectedConsentText,
+    // });
+    const error: any = validation({
       pan,
       blood,
       profession,
       selectedConsentText,
     });
-    console.log(error)
 
-    if (error) {
+    if (error?.message) {
       setLoading(false);
       return showToast(error);
     } else {
-            // dispatch(
-            //   registerForm({
-            //     aadhar,
-            //     pan,
-            //     blood,
-            //     profession,
-            //   }),
-            // );
-            navigation.navigate('paymentVerificationScreen', {
-              dataNew: {
-                aadhar,
-                pan,
-                blood,
-                profession,
-              }
-            });
-//       let payload: any = {
-//         firstName: registerForm?.fullName,
-//         lastName: registerForm?.fullName?.slice(0, 4),
-//         middleName: '',
-//         userId: '',
-//         memberId: 0,
-//         mobileNumber: registerForm?.phoneNumber,
-//         addressLine1: registerForm?.address1,
-//         addressLine2: registerForm?.address2,
-//         city: registerForm?.city,
-//         state: registerForm?.state,
-//         pincode: registerForm?.pinCode,
-//         country: registerForm?.country,
-//         gender: registerForm?.gender,
-//         emailId: registerForm?.email,
-//         idNumber1: aadhar,
-//         // idType1: '',
-//         idNumber2: pan,
-//         profession,
-//         bloodGroup: blood,
-//         // idType2: '',
-//         dateOfBirth: '1994-04-22',
-//         memberShipRegisteredDate: OrphanageDetails?.at(0)?.data?.regDate,
-//         interestIn: OrphanageDetails?.at(0)?.data?.type,
-//         memberOrphanageAssociationId: 0,
-//         sharePIData: true,
-//         paymentRefId: registerForm?.transactionId,
+      // dispatch(
+      //   registerForm({
+      //     aadhar,
+      //     pan,
+      //     blood,
+      //     profession,
+      //   }),
+      // );
+      navigation.navigate('paymentVerificationScreen', {
+        dataNew: {
+          aadhar,
+          pan,
+          blood,
+          profession,
+        },
+      });
+      //       let payload: any = {
+      //         firstName: registerForm?.fullName,
+      //         lastName: registerForm?.fullName?.slice(0, 4),
+      //         middleName: '',
+      //         userId: '',
+      //         memberId: 0,
+      //         mobileNumber: registerForm?.phoneNumber,
+      //         addressLine1: registerForm?.address1,
+      //         addressLine2: registerForm?.address2,
+      //         city: registerForm?.city,
+      //         state: registerForm?.state,
+      //         pincode: registerForm?.pinCode,
+      //         country: registerForm?.country,
+      //         gender: registerForm?.gender,
+      //         emailId: registerForm?.email,
+      //         idNumber1: aadhar,
+      //         // idType1: '',
+      //         idNumber2: pan,
+      //         profession,
+      //         bloodGroup: blood,
+      //         // idType2: '',
+      //         dateOfBirth: '1994-04-22',
+      //         memberShipRegisteredDate: OrphanageDetails?.at(0)?.data?.regDate,
+      //         interestIn: OrphanageDetails?.at(0)?.data?.type,
+      //         memberOrphanageAssociationId: 0,
+      //         sharePIData: true,
+      //         paymentRefId: registerForm?.transactionId,
 
-//         totalAmountPaid:
-//           Number(memberData?.length) *
-//           Number(OrphanageDetails?.at(0)?.data?.mealAmountPerDay),
-//         groupBooking: memberData?.length > 1,
-//       };
-//       try {
-//         if (payload) {
-//           console.log(`auth/signup/member?orphanageId=${Number(
-//             OrphanageDetails?.at(0)?.data?.orphanageId,
-//           )}&quantity=${Number(memberData?.length)}`)
-//           console.log(`pay ${JSON.stringify(payload)}`)
-//           const response: any
-//            =
-//            await API_INSTANCE.post(
-//             `auth/signup/member?orphanageId=${Number(
-//               OrphanageDetails?.at(0)?.data?.orphanageId,
-//             )}&quantity=${Number(memberData?.length)}`,
-//             payload,
-//           );
-//           if (response?.data) {
-//             // await API_INSTANCE.post(
-//             //   `auth/member-booking?orphanageId=${Number(
-//             //     OrphanageDetails?.at(0)?.data?.orphanageId,
-//             //   )}&quantity=${Number(memberData?.length)}`,
-//             //   payload,
-//             // );
-//             let formattedPayload = [];
-//             for(let index = 0; index < memberData?.length; index += 1){
-//               const [day, month, year] = memberData[index]?.bookingDate.split('/');
-// const monthMap = {
-//   Jan: '01',
-//   Feb: '02',
-//   Mar: '03',
-//   Apr: '04',
-//   May: '05',
-//   Jun: '06',
-//   Jul: '07',
-//   Aug: '08',
-//   Sep: '09',
-//   Oct: '10',
-//   Nov: '11',
-//   Dec: '12',
-// };
-// const formattedDate = `${year}-${monthMap[month]}-${day}`;
-// const [dayD, monthD, yearD] = memberData[index]?.memberNameBookedDob.split('/');
-// const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
+      //         totalAmountPaid:
+      //           Number(memberData?.length) *
+      //           Number(OrphanageDetails?.at(0)?.data?.mealAmountPerDay),
+      //         groupBooking: memberData?.length > 1,
+      //       };
+      //       try {
+      //         if (payload) {
+      //           console.log(`auth/signup/member?orphanageId=${Number(
+      //             OrphanageDetails?.at(0)?.data?.orphanageId,
+      //           )}&quantity=${Number(memberData?.length)}`)
+      //           console.log(`pay ${JSON.stringify(payload)}`)
+      //           const response: any
+      //            =
+      //            await API_INSTANCE.post(
+      //             `auth/signup/member?orphanageId=${Number(
+      //               OrphanageDetails?.at(0)?.data?.orphanageId,
+      //             )}&quantity=${Number(memberData?.length)}`,
+      //             payload,
+      //           );
+      //           if (response?.data) {
+      //             // await API_INSTANCE.post(
+      //             //   `auth/member-booking?orphanageId=${Number(
+      //             //     OrphanageDetails?.at(0)?.data?.orphanageId,
+      //             //   )}&quantity=${Number(memberData?.length)}`,
+      //             //   payload,
+      //             // );
+      //             let formattedPayload = [];
+      //             for(let index = 0; index < memberData?.length; index += 1){
+      //               const [day, month, year] = memberData[index]?.bookingDate.split('/');
+      // const monthMap = {
+      //   Jan: '01',
+      //   Feb: '02',
+      //   Mar: '03',
+      //   Apr: '04',
+      //   May: '05',
+      //   Jun: '06',
+      //   Jul: '07',
+      //   Aug: '08',
+      //   Sep: '09',
+      //   Oct: '10',
+      //   Nov: '11',
+      //   Dec: '12',
+      // };
+      // const formattedDate = `${year}-${monthMap[month]}-${day}`;
+      // const [dayD, monthD, yearD] = memberData[index]?.memberNameBookedDob.split('/');
+      // const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
 
-//               const res =  {
-//                 "memberId": response?.data?.data.memberId,
-//                 "totalPaymentMade": OrphanageDetails?.at(0)?.data?.mealAmountPerDay,
-//                 "bookingDate": formattedDate,
-//                 "orphanageId": OrphanageDetails?.at(0)?.data?.orphanageId,
-//                 "memberNameBooked": memberData[index]?.memberNameBooked,
-//                 "memberNameBookedDob": formattedDateDob,
-//                 "memberNameBookedDescription": memberData[index]?.memberBookedDescription
-//               };
-//               formattedPayload.push(res);
-//             }
-//             console.log('formatt', formattedPayload)
-//             await API_INSTANCE.post(
-//              `auth/member-booking`,
-//              formattedPayload,
-//            );
-//             const userWithOrphanageId = {
-//               ...response?.data?.data, // Spread existing user data
-//               orphanageId: OrphanageDetails?.at(0)?.data?.orphanageId, // Add orphanageId to the user object
-//             };
-//             console.log(JSON.stringify(userWithOrphanageId));
-//             setLoading(false);
-//             navigation.navigate('paymentScreen', {
-//               user: userWithOrphanageId
-//             });
-//           }
-//         }
-//       } catch (error: any) {
-//         console.log(error?.response?.data)
-//         setLoading(false);
-//         showToast({
-//           message: error?.response?.data?.message,
-//           duration: 5000,
-//           status: 'error',
-//           slideFrom: 'right',
-//         });
-//       }
+      //               const res =  {
+      //                 "memberId": response?.data?.data.memberId,
+      //                 "totalPaymentMade": OrphanageDetails?.at(0)?.data?.mealAmountPerDay,
+      //                 "bookingDate": formattedDate,
+      //                 "orphanageId": OrphanageDetails?.at(0)?.data?.orphanageId,
+      //                 "memberNameBooked": memberData[index]?.memberNameBooked,
+      //                 "memberNameBookedDob": formattedDateDob,
+      //                 "memberNameBookedDescription": memberData[index]?.memberBookedDescription
+      //               };
+      //               formattedPayload.push(res);
+      //             }
+      //             console.log('formatt', formattedPayload)
+      //             await API_INSTANCE.post(
+      //              `auth/member-booking`,
+      //              formattedPayload,
+      //            );
+      //             const userWithOrphanageId = {
+      //               ...response?.data?.data, // Spread existing user data
+      //               orphanageId: OrphanageDetails?.at(0)?.data?.orphanageId, // Add orphanageId to the user object
+      //             };
+      //             console.log(JSON.stringify(userWithOrphanageId));
+      //             setLoading(false);
+      //             navigation.navigate('paymentScreen', {
+      //               user: userWithOrphanageId
+      //             });
+      //           }
+      //         }
+      //       } catch (error: any) {
+      //         console.log(error?.response?.data)
+      //         setLoading(false);
+      //         showToast({
+      //           message: error?.response?.data?.message,
+      //           duration: 5000,
+      //           status: 'error',
+      //           slideFrom: 'right',
+      //         });
+      //       }
     }
   };
   const handleIdChange = (text: string, type: string) => {
@@ -226,11 +245,9 @@ const IdentityVerificationScreen = () => {
       setAadhar(text);
     } else if (type === 'pan') {
       setPan(text);
-    }
-    else if (type === 'blood') {
+    } else if (type === 'blood') {
       setBlood(text);
-    }
-    else if (type === 'profession') {
+    } else if (type === 'profession') {
       setProfession(text);
     }
   };
@@ -273,38 +290,37 @@ const IdentityVerificationScreen = () => {
       <View style={styles.idContainer}>
         <Text style={styles.idText}>Verification</Text>
         <View style={{backgroundColor: 'white', borderRadius: 10}}>
-        
-     <TextFieldDropdown
-       radius={16}
-       placeholder={'Blood group'}
-  dropDownValues={['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']}
-  value={blood}
-  height={60}
-  placeholderTextColor={theme.black}
-  backgroundColor={theme.white}
-  borderColor="white" // 🔹 Custom border color
-  borderWidth={2} // 🔹 Custom border width
-  borderRadius={10} // 🔹 Custom border radius
-  width={380} // 🔹 Custom width
-  onChange={setBlood}
-  textColor={theme.black}
-  hoveredIndex={hoveredIndex}
-  setHoveredIndex={setHoveredIndex}
-/>
-                   </View>
-                   <View style={{marginTop: 15}}>
-        <TextInputComponent
-          backgroundColor={theme.white}
-          height={50}
-          radius={10}
-          type="text"
-          placeholder="Profession"
-          placeholderTextColor={COLOR.darkGray}
-          textColor={COLOR.black}
-          onChange={(text: any) => handleIdChange(text, 'profession')}
-          value={profession}
-          inputName="profession"
-        />
+          <TextFieldDropdown
+            radius={16}
+            placeholder={'Blood group'}
+            dropDownValues={['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']}
+            value={blood}
+            height={60}
+            placeholderTextColor={theme.black}
+            backgroundColor={theme.white}
+            borderColor="white" // 🔹 Custom border color
+            borderWidth={2} // 🔹 Custom border width
+            borderRadius={10} // 🔹 Custom border radius
+            width={380} // 🔹 Custom width
+            onChange={setBlood}
+            textColor={theme.black}
+            hoveredIndex={hoveredIndex}
+            setHoveredIndex={setHoveredIndex}
+          />
+        </View>
+        <View style={{marginTop: 15}}>
+          <TextInputComponent
+            backgroundColor={theme.white}
+            height={50}
+            radius={10}
+            type="text"
+            placeholder="Profession"
+            placeholderTextColor={COLOR.darkGray}
+            textColor={COLOR.black}
+            onChange={(text: any) => handleIdChange(text, 'profession')}
+            value={profession}
+            inputName="profession"
+          />
         </View>
       </View>
     );

@@ -1,14 +1,14 @@
-import { Image, StyleSheet, Text, View, Dimensions } from 'react-native';
+import {Image, StyleSheet, Text, View, Dimensions} from 'react-native';
 import React from 'react';
 import ContainerProvider from '../components/providers/ContainerProvider';
 import ImageBackgroundProvider from '../components/providers/BackgroundGradiantProvider';
-import { COLOR } from '../utils/colors';
+import {COLOR} from '../utils/colors';
 import CustomButtonField from '../components/fields/CustomButtonField';
-import { theme } from '../utils/theme';
-import { useNavigation } from '@react-navigation/native';
+import {theme} from '../utils/theme';
+import {useNavigation} from '@react-navigation/native';
 
 // Get screen width and height for responsiveness
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const WelcomeScreen = () => {
   const navigation = useNavigation<any>();
@@ -23,7 +23,8 @@ const WelcomeScreen = () => {
             source={require('../assets/images/whitelogo.png')}
             style={styles.logo}
           />
-          <Text style={styles.welcomeText}>AN INITIATIVE </Text>  <Text style={styles.welcomeText}>BY</Text>
+          <Text style={styles.welcomeText}>AN INITIATIVE </Text>{' '}
+          <Text style={styles.welcomeText}>BY</Text>
           <Text style={styles.welcomeText1}>INSPIRATIONS</Text>
           <Text style={styles.welcomeText2}>PUBLIC CHARITABLE TRUST</Text>
         </View>
@@ -32,7 +33,8 @@ const WelcomeScreen = () => {
           <View style={styles.textArangement}>
             <Text style={styles.bottomText}>•</Text>
             <Text style={styles.bottomText}>
-              Aims at connecting charitable families to support old aged homes & orphanages with benevolence
+              Aims at connecting charitable families to support old aged homes &
+              orphanages with benevolence
             </Text>
           </View>
 
@@ -89,13 +91,15 @@ const styles = StyleSheet.create({
     fontSize: width * 0.08,
     fontWeight: '600',
     color: COLOR.white,
-    marginVertical: height * 0.01,
+    marginTop: height * 0.01,
+    letterSpacing: 2,
   },
   welcomeText2: {
     fontSize: width * 0.045,
     fontWeight: '600',
     color: COLOR.white,
-    marginVertical: height * 0.01,
+    marginBottom: height * 0.01,
+    marginTop: 4,
   },
   textArangement: {
     flexDirection: 'row',

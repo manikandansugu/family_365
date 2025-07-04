@@ -1,8 +1,8 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import React, { useState } from 'react';
-import { COLOR } from '../../utils/colors';
-import { TextInputFieldInterface } from '../../entities/commonObjects';
-import { EyeCloseIcon, EyeOpenIcon, UploadIcon } from '../../assets/svg';
+import {Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
+import React, {useState} from 'react';
+import {COLOR} from '../../utils/colors';
+import {TextInputFieldInterface} from '../../entities/commonObjects';
+import {EyeCloseIcon, EyeOpenIcon, UploadIcon} from '../../assets/svg';
 
 const TextInputComponent = (props: TextInputFieldInterface) => {
   const {
@@ -33,12 +33,17 @@ const TextInputComponent = (props: TextInputFieldInterface) => {
   };
 
   return (
-    <View style={{ flex: 1, position: 'relative' }}>
+    <View style={{flex: 1, position: 'relative'}}>
       <TextInput
         style={[
-          { backgroundColor: editable ? backgroundColor : '#f0f0f0' }, // 🔹 Light gray if disabled
-          { height: height, borderRadius: radius, color: editable ? textColor : '#a0a0a0', width: width }, // 🔹 Gray text if disabled
-          { paddingRight: type === 'upload' ? 100 : null },
+          {backgroundColor: editable ? backgroundColor : '#f0f0f0'}, // 🔹 Light gray if disabled
+          {
+            height: height,
+            borderRadius: radius,
+            color: editable ? textColor : '#a0a0a0',
+            width: width,
+          }, // 🔹 Gray text if disabled
+          {paddingRight: type === 'upload' ? 100 : null},
           styles.textField,
           !editable && styles.disabledField, // 🔹 Reduced opacity if disabled
         ]}
@@ -53,7 +58,7 @@ const TextInputComponent = (props: TextInputFieldInterface) => {
 
       {type === 'password' && editable && (
         <Pressable
-          style={{ position: 'absolute', right: 20, top: 13 }}
+          style={{position: 'absolute', right: 20, top: 13}}
           onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
           {isPasswordVisible ? <EyeCloseIcon /> : <EyeOpenIcon />}
         </Pressable>

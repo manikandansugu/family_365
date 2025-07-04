@@ -7,6 +7,7 @@ import WelcomeScreen from '../screens/WelcomeScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import Screen from '../screens/screen';
 import PaymentVerificationScreen from '../screens/PaymentVerificationScreen';
+import PaymentSummaryScreen from '../screens/PaymentSummaryScreen';
 
 type RootStackParamList = {
   register: undefined;
@@ -19,6 +20,7 @@ type RootStackParamList = {
   paymentScreen: undefined;
   paymentVerificationScreen: undefined;
   screen: undefined;
+  paymentSummaryScreen: {amount: number};
 };
 
 const AuthNavigator = () => {
@@ -56,15 +58,20 @@ const AuthNavigator = () => {
         options={{headerShown: false}}
         component={WelcomeScreen}
       />
-        <Stack.Screen
+      <Stack.Screen
         name="paymentVerificationScreen"
         options={{headerShown: false}}
         component={PaymentVerificationScreen}
       />
-         <Stack.Screen
+      <Stack.Screen
         name="screen"
         options={{headerShown: false}}
         component={Screen}
+      />
+      <Stack.Screen
+        options={{headerShown: false}}
+        name="paymentSummaryScreen"
+        component={PaymentSummaryScreen}
       />
     </Stack.Navigator>
   );

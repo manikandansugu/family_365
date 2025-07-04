@@ -1,4 +1,4 @@
-import {Alert, Clipboard, Image, Keyboard, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ContainerProvider from '../components/providers/ContainerProvider';
 import ImageBackgroundProvider from '../components/providers/BackgroundGradiantProvider';
@@ -6,37 +6,41 @@ import KeyboardAvoidingProvider from '../components/providers/KeyboardAvoidingPr
 import {COLOR} from '../utils/colors';
 import TextInputComponent from '../components/fields/TextInputComponent';
 import {theme} from '../utils/theme';
-import RadioButtonComponent from '../components/fields/RadioButtonComponent';
 import CustomButtonField from '../components/fields/CustomButtonField';
 import {useNavigation} from '@react-navigation/native';
-import {useAuthState} from '../context/AuthContext';
-import {
-  handleIdentityValidation,
-  handleTransactionValidation,
-  OPEN_CAMERA,
-  OPEN_GALLERY,
-} from '../utils/helpers';
 import {useToaster} from '../components/providers/ToasterProvider';
 import {RootState} from '../redux/store';
 import {useSelector} from 'react-redux';
 import API_INSTANCE from '../config/apiClient';
 
-const PaymentVerificationScreen = ({route}) => {
+const PaymentVerificationScreen = ({route}: any) => {
   const {showToast} = useToaster();
   const navigation = useNavigation<any>();
   const registerData = useSelector((state: RootState) => state.authSlice);
   const {OrphanageDetails} = useSelector(
     (state: RootState) => state.orphanageDetails,
   );
-  const { dataNew } = route.params;
+  const {dataNew} = route.params;
   const {registerForm, memberData}: any = registerData ?? {};
-  console.log('registerForm',registerForm)
-  console.log('OrphanageDetails',OrphanageDetails)
-  console.log('memberData',memberData)
+  // console.log('registerForm', registerForm?.orphanageId);
+  // console.log('OrphanageDetails', OrphanageDetails);
+  // console.log('memberData', memberData);
+  // console.log('orphanage id', OrphanageDetails?.at(0)?.data?.orphanageId);
+  // console.log('email', registerForm?.email);
+  // console.log('email', registerForm?.fullName);
+  // console.log('email', registerForm?.phoneNumber);
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
-   const [transactionId, setTransactionId] = useState<string>();
+  const [transactionId, setTransactionId] = useState<string>();
 
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<any>({
+    amount: '',
+    productInfo: '',
+    firstName: registerForm?.fullName,
+    email: registerForm?.email,
+    phone: registerForm?.phoneNumber?.toString(),
+    orphangeId: OrphanageDetails?.at(0)?.data?.orphanageId?.toString(),
+  });
   const [digitalPaymentId, setDigitalPaymentId] = useState<string>();
 
   useEffect(() => {
@@ -44,136 +48,167 @@ const PaymentVerificationScreen = ({route}) => {
       setDigitalPaymentId(OrphanageDetails[0]?.data?.digitalPaymentId);
     }
   }, [OrphanageDetails]);
-  
+
   const onProceed = async () => {
-    setLoading(true);
-    const error = handleTransactionValidation({
-        transactionId,
+    navigation.navigate('paymentSummaryScreen', {
+      amount: formData?.amount,
+      dataNew: dataNew,
     });
-    console.log(error)
-
-    if (error) {
-      setLoading(false);
-      return showToast(error);
-    } else {
-      let payload: any = {
-        firstName: registerForm?.fullName,
-        lastName: registerForm?.fullName?.slice(0, 4),
-        middleName: '',
-        userId: '',
-        memberId: 0,
-        mobileNumber: registerForm?.phoneNumber,
-        addressLine1: registerForm?.address1,
-        addressLine2: registerForm?.address2,
-        city: registerForm?.city,
-        state: registerForm?.state,
-        pincode: registerForm?.pinCode,
-        country: registerForm?.country,
-        gender: registerForm?.gender,
-        emailId: registerForm?.email,
-        idNumber1: dataNew?.aadhar,
-        // idType1: '',
-        idNumber2: dataNew?.pan,
-        profession: dataNew?.profession,
-        bloodGroup: dataNew?.blood,
-        // idType2: '',
-        dateOfBirth: '1994-04-22',
-        memberShipRegisteredDate: OrphanageDetails?.at(0)?.data?.regDate,
-        interestIn: OrphanageDetails?.at(0)?.data?.type,
-        memberOrphanageAssociationId: 0,
-        sharePIData: true,
-        paymentRefId: transactionId,
-
-        totalAmountPaid:
-          Number(memberData?.length) *
-          Number(OrphanageDetails?.at(0)?.data?.mealAmountPerDay),
-        groupBooking: memberData?.length > 1,
-      };
-      try {
-        if (payload) {
-          console.log(`auth/signup/member?orphanageId=${Number(
-            OrphanageDetails?.at(0)?.data?.orphanageId,
-          )}&quantity=${Number(memberData?.length)}`)
-          console.log(`pay ${JSON.stringify(payload)}`)
-          const response: any
-           =
-           await API_INSTANCE.post(
-            `auth/signup/member?orphanageId=${Number(
-              OrphanageDetails?.at(0)?.data?.orphanageId,
-            )}&quantity=${Number(memberData?.length)}`,
-            payload,
-          );
-          if (response?.data) {
-            // await API_INSTANCE.post(
-            //   `auth/member-booking?orphanageId=${Number(
-            //     OrphanageDetails?.at(0)?.data?.orphanageId,
-            //   )}&quantity=${Number(memberData?.length)}`,
-            //   payload,
-            // );
-            let formattedPayload = [];
-            for(let index = 0; index < memberData?.length; index += 1){
-              const [day, month, year] = memberData[index]?.bookingDate.split('/');
-const monthMap = {
-  Jan: '01',
-  Feb: '02',
-  Mar: '03',
-  Apr: '04',
-  May: '05',
-  Jun: '06',
-  Jul: '07',
-  Aug: '08',
-  Sep: '09',
-  Oct: '10',
-  Nov: '11',
-  Dec: '12',
-};
-const formattedDate = `${year}-${monthMap[month]}-${day}`;
-const [dayD, monthD, yearD] = memberData[index]?.memberNameBookedDob.split('/');
-const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
-
-              const res =  {
-                "memberId": response?.data?.data.memberId,
-                "totalPaymentMade": OrphanageDetails?.at(0)?.data?.mealAmountPerDay,
-                "bookingDate": formattedDateDob,
-                "orphanageId": OrphanageDetails?.at(0)?.data?.orphanageId,
-                "memberNameBooked": memberData[index]?.memberNameBooked,
-                "memberNameBookedDob": formattedDateDob,
-                "memberNameBookedDescription": memberData[index]?.memberBookedDescription
-              };
-              formattedPayload.push(res);
-            }
-            console.log('formatt', formattedPayload)
-            await API_INSTANCE.post(
-             `auth/member-booking`,
-             formattedPayload,
-           );
-            const userWithOrphanageId = {
-              ...response?.data?.data, // Spread existing user data
-              orphanageId: OrphanageDetails?.at(0)?.data?.orphanageId, // Add orphanageId to the user object
-            };
-            console.log(JSON.stringify(userWithOrphanageId));
-            setLoading(false);
-            navigation.navigate('paymentScreen', {
-              user: userWithOrphanageId
-            });
-          }
-        }
-      } catch (error: any) {
-        console.log(error?.response?.data)
-        setLoading(false);
+    try {
+      if (formData?.amount && formData?.productInfo) {
+        setLoading(true);
+        const response = await API_INSTANCE.post(
+          '/v2/payment/create-order',
+          formData,
+        );
+        console.log('response ', response);
+      } else {
         showToast({
-          message: error?.response?.data?.message,
+          message: 'please fill all fields',
           duration: 5000,
           status: 'error',
           slideFrom: 'right',
         });
       }
+    } catch (error: any) {
+      setLoading(false);
+      console.log(error);
+      console.log(error?.response?.data?.message);
+      console.log(error?.data?.response?.message);
+    } finally {
+      setLoading(false);
     }
   };
+  // const onProceed = async () => {
+  //   // setLoading(true);
+  //   const error = false;
+  //   console.log(error);
+
+  //   if (error) {
+  //     setLoading(false);
+  //     return showToast(error);
+  //   } else {
+  //     let payload: any = {
+  //       firstName: registerForm?.fullName,
+  //       lastName: registerForm?.fullName?.slice(0, 4),
+  //       middleName: '',
+  //       userId: '',
+  //       memberId: 0,
+  //       mobileNumber: registerForm?.phoneNumber,
+  //       addressLine1: registerForm?.address1,
+  //       addressLine2: registerForm?.address2,
+  //       city: registerForm?.city,
+  //       state: registerForm?.state,
+  //       pincode: registerForm?.pinCode,
+  //       country: registerForm?.country,
+  //       gender: registerForm?.gender,
+  //       emailId: registerForm?.email,
+  //       idNumber1: dataNew?.aadhar,
+  //       // idType1: '',
+  //       idNumber2: dataNew?.pan,
+  //       profession: dataNew?.profession,
+  //       bloodGroup: dataNew?.blood,
+  //       // idType2: '',
+  //       dateOfBirth: '1994-04-22',
+  //       memberShipRegisteredDate: OrphanageDetails?.at(0)?.data?.regDate,
+  //       interestIn: OrphanageDetails?.at(0)?.data?.type,
+  //       memberOrphanageAssociationId: 0,
+  //       sharePIData: true,
+  //       paymentRefId: transactionId || '',
+
+  //       totalAmountPaid:
+  //         Number(memberData?.length) *
+  //         Number(OrphanageDetails?.at(0)?.data?.mealAmountPerDay),
+  //       groupBooking: memberData?.length > 1,
+  //     };
+  //     console.log(payload);
+  //     try {
+  //       if (payload) {
+  //         console.log(
+  //           `auth/signup/member?orphanageId=${Number(
+  //             OrphanageDetails?.at(0)?.data?.orphanageId,
+  //           )}&quantity=${Number(memberData?.length)}`,
+  //         );
+  //         console.log(`pay ${JSON.stringify(payload)}`);
+  //         const response: any = await API_INSTANCE.post(
+  //           `auth/signup/member?orphanageId=${Number(
+  //             OrphanageDetails?.at(0)?.data?.orphanageId,
+  //           )}&quantity=${Number(memberData?.length)}`,
+  //           payload,
+  //         );
+  //         if (response?.data) {
+  //           // await API_INSTANCE.post(
+  //           //   `auth/member-booking?orphanageId=${Number(
+  //           //     OrphanageDetails?.at(0)?.data?.orphanageId,
+  //           //   )}&quantity=${Number(memberData?.length)}`,
+  //           //   payload,
+  //           // );
+  //           let formattedPayload = [];
+  //           for (let index = 0; index < memberData?.length; index += 1) {
+  //             const [day, month, year] =
+  //               memberData[index]?.bookingDate.split('/');
+  //             const monthMap = {
+  //               Jan: '01',
+  //               Feb: '02',
+  //               Mar: '03',
+  //               Apr: '04',
+  //               May: '05',
+  //               Jun: '06',
+  //               Jul: '07',
+  //               Aug: '08',
+  //               Sep: '09',
+  //               Oct: '10',
+  //               Nov: '11',
+  //               Dec: '12',
+  //             };
+  //             const formattedDate = `${year}-${monthMap[month]}-${day}`;
+  //             const [dayD, monthD, yearD] =
+  //               memberData[index]?.memberNameBookedDob.split('/');
+  //             const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
+
+  //             const res = {
+  //               memberId: response?.data?.data.memberId,
+  //               totalPaymentMade:
+  //                 OrphanageDetails?.at(0)?.data?.mealAmountPerDay,
+  //               bookingDate: formattedDateDob,
+  //               orphanageId: OrphanageDetails?.at(0)?.data?.orphanageId,
+  //               memberNameBooked: memberData[index]?.memberNameBooked,
+  //               memberNameBookedDob: formattedDateDob,
+  //               memberNameBookedDescription:
+  //                 memberData[index]?.memberBookedDescription,
+  //             };
+  //             formattedPayload.push(res);
+  //           }
+  //           // console.log('formatt', formattedPayload);
+  //           await API_INSTANCE.post(`auth/member-booking`, formattedPayload);
+  //           const userWithOrphanageId = {
+  //             ...response?.data?.data, // Spread existing user data
+  //             orphanageId: OrphanageDetails?.at(0)?.data?.orphanageId, // Add orphanageId to the user object
+  //           };
+  //           console.log(JSON.stringify(userWithOrphanageId));
+  //           setLoading(false);
+  //           navigation.navigate('paymentScreen', {
+  //             user: userWithOrphanageId,
+  //           });
+  //         }
+  //       }
+  //     } catch (error: any) {
+  //       console.log(error?.response?.data);
+  //       setLoading(false);
+  //       showToast({
+  //         message: error?.response?.data?.message,
+  //         duration: 5000,
+  //         status: 'error',
+  //         slideFrom: 'right',
+  //       });
+  //     }
+  //   }
+  // };
+
   const costPerMember = OrphanageDetails?.at(0)?.data?.mealAmountPerDay ?? 0;
   const numberOfMembers = memberData?.length ?? 1;
   const totalCost = costPerMember * numberOfMembers;
-  
+
   const _receiptSection = () => {
     return (
       <View style={styles.receiptContainer}>
@@ -188,12 +223,15 @@ const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
         </View>
         <View style={styles.receiptRow}>
           <Text style={styles.receiptLabel}>Total</Text>
-          <Text style={{
-    fontSize: 14,
-    // marginBottom: 10,
-    color: COLOR.white,
-    fontWeight: 'bold',
-  }}>{totalCost}</Text>
+          <Text
+            style={{
+              fontSize: 14,
+              // marginBottom: 10,
+              color: COLOR.white,
+              fontWeight: 'bold',
+            }}>
+            {totalCost}
+          </Text>
         </View>
       </View>
     );
@@ -201,45 +239,42 @@ const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
 
   const _identityGroupSection = () => {
     // Copy to Clipboard Function
-    const handleCopy = (text: string | undefined) => {
-      Clipboard.setString(text ?? ''); // Copies text to clipboard
-      Alert.alert('Copied', `${text} copied to clipboard`);
-    };
-  
+    // const handleCopy = (text: string | undefined) => {
+    //   Clipboard.setString(text ?? ''); // Copies text to clipboard
+    //   Alert.alert('Copied', `${text} copied to clipboard`);
+    // };
+
     return (
       <View style={styles.idContainer}>
         <Text style={styles.idText}>Payment Verification</Text>
         {_receiptSection()}
         <Text style={styles.idTextT}>UPI ID</Text>
         {/* Profession Section */}
-        <View style={styles.row}>
-          <TextInput
-            style={[styles.input, { flex: 1 }]}
-            value={digitalPaymentId}
-            editable={false} // Make it read-only
-            placeholder="UPI Id"
-            placeholderTextColor={COLOR.darkGray}
+        <View style={{marginBottom: 15}}>
+          <TextInputComponent
+            backgroundColor={theme.white}
+            radius={16}
+            height={50}
+            placeholder="Amount"
+            placeholderTextColor={theme.black}
+            textColor={theme.black}
+            type="number"
+            onChange={Am => setFormData({...formData, amount: Am})}
+            value={formData.amount}
           />
-          <TouchableOpacity
-            style={styles.copyButton}
-            onPress={() => handleCopy(digitalPaymentId)}
-          >
-            <Text style={styles.copyText}>Copy</Text>
-          </TouchableOpacity>
         </View>
-        <Text style={styles.idTextT}>Transaction ID</Text>
-        {/* Next Input Box */}
-        <TextInputComponent
-          backgroundColor={theme.white}
-          height={50}
-          radius={10}
-          type="text"
-          placeholder="Transaction Id"
-          placeholderTextColor={COLOR.darkGray}
-          textColor={COLOR.black}
-          onChange={setTransactionId}
-          value={transactionId}
-        />
+        <View style={{marginBottom: 10}}>
+          <TextInputComponent
+            backgroundColor={theme.white}
+            radius={16}
+            height={50}
+            placeholder="Product Info"
+            placeholderTextColor={theme.black}
+            textColor={theme.black}
+            onChange={pIfo => setFormData({...formData, productInfo: pIfo})}
+            value={formData.productInfo}
+          />
+        </View>
       </View>
     );
   };
@@ -308,7 +343,7 @@ const styles = StyleSheet.create({
     marginBottom: 26,
   },
   receiptContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)', 
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,

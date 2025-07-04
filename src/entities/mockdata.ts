@@ -270,6 +270,36 @@ export const allCountry = [
   'Zambia',
   'Zimbabwe',
   'Holy See (Vatican City)',
-  'State of Palestine'
-]
+  'State of Palestine',
+];
 
+const changeCurrency = (amount: number | string) => {
+  const currencyFormatter = Number(amount) / 100;
+  const format = '₹' + currencyFormatter;
+  return format;
+};
+export const razorpayOptions = {
+  // key: 'rzp_test_odA60UE7A67ZD7',
+  amount: changeCurrency('105982'), // Amount in paise
+  currency: 'INR',
+  name: 'Acme Corp',
+  description: 'Test Transaction',
+  // image: 'https://example.com/your_logo',
+  order_id: 'order_Qjlb5a2eKOPxC2',
+  // handler: function (response: any) {
+  //   alert(`Payment ID: ${response.razorpay_payment_id}`);
+  //   alert(`Order ID: ${response.razorpay_order_id}`);
+  //   alert(`Signature: ${response.razorpay_signature}`);
+  // },
+  prefill: {
+    name: 'test split',
+    email: 'gaurav.kumar@example.com',
+    contact: '9000090000',
+  },
+  notes: {
+    address: 'Razorpay Corporate Office',
+  },
+  // theme: {
+  //   color: '#3399cc',
+  // },
+};

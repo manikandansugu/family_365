@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Text} from 'react-native';
 import React, {useEffect} from 'react';
 import LottieView from 'lottie-react-native';
 import ImageBackgroundProvider from '../components/providers/BackgroundGradiantProvider';
@@ -41,5 +41,3 @@ const PaymentScreen = ({route}: any) => {
 };
 
 export default PaymentScreen;
-
-const styles = StyleSheet.create({});

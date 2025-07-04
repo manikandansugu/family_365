@@ -1,4 +1,4 @@
-package com.family_365
+package com.family365
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

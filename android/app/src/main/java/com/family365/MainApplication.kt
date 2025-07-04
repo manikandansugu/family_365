@@ -1,4 +1,4 @@
-package com.family_365
+package com.family365
 
 import android.app.Application
 import com.facebook.react.PackageList

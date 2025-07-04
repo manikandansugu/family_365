@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import { ViewStyle } from 'react-native';
+import React, {CSSProperties, ReactNode} from 'react';
+import {ViewStyle} from 'react-native';
 
 export interface ContainerProviderProps {
   children: ReactNode;
@@ -31,7 +31,7 @@ export interface TextInputFieldInterface {
   backgroundColor: string;
   height: number;
   radius: number;
-  width: number;
+  width?: number;
   textColor: string;
   type?: string | undefined;
   value: any;
@@ -39,6 +39,7 @@ export interface TextInputFieldInterface {
   hoveredIndex?: any | undefined;
   error?: string;
   inputName?: string;
+  editable?: boolean;
   onUploadClick?: (textInputType: any) => void;
   setHoveredIndex?: React.Dispatch<React.SetStateAction<any | undefined>>;
   onChange: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -122,12 +123,12 @@ export interface Address {
 }
 
 export interface ICustomButton {
-  style: any;
+  style: CSSProperties;
   onPress: () => void;
   textColor: string;
   buttonText: string;
   opacity: number;
-  textStyle?: any;
+  textStyle?: CSSProperties;
 }
 
 export type LoaderProps = {
