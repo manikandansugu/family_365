@@ -1,8 +1,8 @@
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
-import { Buffer } from 'buffer';
+import {Buffer} from 'buffer';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -16,7 +16,7 @@ import {
   BackHandler,
   Linking,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   ClockIcon,
   GroupIcon,
@@ -28,16 +28,16 @@ import ContainerProvider from '../components/providers/ContainerProvider';
 import GradiantProvider from '../components/providers/GradiantProvider';
 import MealProviderModal from '../components/view/MealProvideSliderModalView';
 import TopInfoBar from '../components/view/TopInfoBar';
-import { OrphanageData, OrphanageResponse } from '../entities/commonObjects';
-import { tabMenuItems } from '../entities/entryObjects';
-import { memberData } from '../redux/slices/authSlice';
-import { AppDispatch, RootState } from '../redux/store';
-import { COLOR } from '../utils/colors';
-import { LayoutAnimations, validateBookings } from '../utils/helpers';
+import {OrphanageData, OrphanageResponse} from '../entities/commonObjects';
+import {tabMenuItems} from '../entities/entryObjects';
+import {memberData} from '../redux/slices/authSlice';
+import {AppDispatch, RootState} from '../redux/store';
+import {COLOR} from '../utils/colors';
+import {LayoutAnimations, validateBookings} from '../utils/helpers';
 import API_INSTANCE from '../config/apiClient';
-import { PhoneIcon } from '../assets/svg/PhoneIcon';
-import { WebIcon } from '../assets/svg/WebIcon';
-import { resetState } from '../redux/slices/dataSlice';
+import {PhoneIcon} from '../assets/svg/PhoneIcon';
+import {WebIcon} from '../assets/svg/WebIcon';
+import {resetState} from '../redux/slices/dataSlice';
 
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -51,24 +51,25 @@ const OrphanageScreen = ({route}) => {
   //   (state: RootState) => state.orphanageDetails,
   // );
   const {OrphanageDetails} = route.params;
-  console.log(OrphanageDetails)
   const [selectedTabMenu, setSelectedTabMenu] = useState<any>(
     tabMenuItems?.at(0)?.text,
   );
   const fetchOrphanageLogo = async (orphanageId: string) => {
     try {
       setLoadingLogo(true);
-      const response = await API_INSTANCE.get(`v1/storage/fetch-logo-for-orphanage`,
+      const response = await API_INSTANCE.get(
+        `v1/storage/fetch-logo-for-orphanage`,
         {
-          params: { orphanageId },
+          params: {orphanageId},
           responseType: 'arraybuffer', // Ensure binary data is fetched
-        }
+        },
       );
 
       // Convert binary data to Base64
-      const base64Image = `data:image/png;base64,${Buffer.from(response.data, 'binary').toString(
-        'base64'
-      )}`;
+      const base64Image = `data:image/png;base64,${Buffer.from(
+        response.data,
+        'binary',
+      ).toString('base64')}`;
       setLogoUri(base64Image);
     } catch (error) {
       console.error('Error fetching orphanage logo:', error);
@@ -105,13 +106,12 @@ const OrphanageScreen = ({route}) => {
       dispatch(resetState());
       return false; // Allow default back behavior
     };
-  
+
     BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     };
   }, [dispatch]);
-  
 
   const _fist_section = (orphanage: OrphanageData) => {
     return (
@@ -123,15 +123,15 @@ const OrphanageScreen = ({route}) => {
           {loadingLogo ? (
             <ActivityIndicator size="small" color={COLOR.seaGreen} />
           ) : (
-           <Image
-  source={
-    logoUri
-      ? { uri: logoUri }
-      : require('../assets/images/section1.png')
-  }
-  style={styles.section1Image}
-  resizeMode="contain" // This behaves like object-fit: cover
-/>
+            <Image
+              source={
+                logoUri
+                  ? {uri: logoUri}
+                  : require('../assets/images/section1.png')
+              }
+              style={styles.section1Image}
+              resizeMode="contain" // This behaves like object-fit: cover
+            />
           )}
           {/* Text Section */}
           <View style={{marginLeft: 3, flex: 1}}>
@@ -171,30 +171,30 @@ const OrphanageScreen = ({route}) => {
                 <Text style={styles.subText}>{orphanage?.mobileNo}</Text>
               </Text>
             </View>
-         
-{orphanage?.website ? (
-  <Pressable
-    onPress={() => {
-      let url = orphanage.website;
-      // Ensure the URL has a protocol; prepend if necessary.
-      if (!url.startsWith('https')) {
-        url = 'https://' + url;
-      }
-      // Try to open the URL directly
-      Linking.openURL(url).catch((err) => {
-        console.error("Failed to open URL:", err);
-      });
-    }}>
-    <View style={styles.rowContainer}>
-      <WebIcon />
-      <Text style={styles.rowText}>
-        <Text style={styles.subText}>{orphanage?.website}</Text>
-      </Text>
-    </View>
-  </Pressable>
-) : (
-  <View />
-)}
+
+            {orphanage?.website ? (
+              <Pressable
+                onPress={() => {
+                  let url = orphanage.website;
+                  // Ensure the URL has a protocol; prepend if necessary.
+                  if (!url.startsWith('https')) {
+                    url = 'https://' + url;
+                  }
+                  // Try to open the URL directly
+                  Linking.openURL(url).catch(err => {
+                    console.error('Failed to open URL:', err);
+                  });
+                }}>
+                <View style={styles.rowContainer}>
+                  <WebIcon />
+                  <Text style={styles.rowText}>
+                    <Text style={styles.subText}>{orphanage?.website}</Text>
+                  </Text>
+                </View>
+              </Pressable>
+            ) : (
+              <View />
+            )}
           </View>
         </View>
       </GradiantProvider>
@@ -223,12 +223,11 @@ const OrphanageScreen = ({route}) => {
               </View>
 
               <Text style={styles.subHeading}>
-              Sponsor a meal and make a real impact on their life…
+                Sponsor a meal and make a real impact on their life…
               </Text>
             </View>
 
-            <View
-              style={styles.contributeButton}>
+            <View style={styles.contributeButton}>
               <Text style={styles.contributeButtonText}>Contribute</Text>
             </View>
           </View>
@@ -319,26 +318,23 @@ const OrphanageScreen = ({route}) => {
     );
   };
 
- 
   const _fourth_section = (orphanage: OrphanageData) => {
     const meals = JSON.parse(orphanage.mealMenu); // New data structure
-    console.log(`meals`, orphanage)
     const vision = orphanage.vision;
     const mission = orphanage.mission;
     const certificateList = JSON.parse(orphanage.certificateList);
-  
+
     return (
       <GradiantProvider
         style={styles.fourthSection}
-        colors={['#F4C4F3', '#FDB2FF']}
-      >
+        colors={['#F4C4F3', '#FDB2FF']}>
         {selectedTabMenu === 'Certificate List' ? (
           <View style={styles.mealContainer1}>
             {certificateList.map((certificate: any, index: number) => (
               <View key={index} style={styles.titleContainer1}>
-                      {/* <Text style={styles.title1}>Certificate List</Text> */}
+                {/* <Text style={styles.title1}>Certificate List</Text> */}
                 <Text style={styles.certificateText}>
-                 {certificate.certificateName}
+                  {certificate.certificateName}
                 </Text>
                 <Text style={styles.certificateText}>
                   Issued date: {certificate.issueData}
@@ -355,41 +351,42 @@ const OrphanageScreen = ({route}) => {
         ) : selectedTabMenu === 'Vision & Mission' ? (
           <View style={styles.mealContainer1}>
             {/* {certificateList.map((certificate: any, index: number) => ( */}
-              <View style={styles.titleContainer1}>
-                      {/* <Text style={styles.title1}>Certificate List</Text> */}
-            
-                <Text style={styles.certificateText}>
-                  <Text style={{fontWeight: '700'}}>Vision:</Text> {vision}
-                </Text>
-                {/* {'\n'} */}
-                <Text style={styles.certificateText}>
-                <Text style={{fontWeight: '700'}}>{'\n'}Mission:</Text> {mission}
-                </Text>
-                {/* <Text style={styles.certificateText}>
+            <View style={styles.titleContainer1}>
+              {/* <Text style={styles.title1}>Certificate List</Text> */}
+
+              <Text style={styles.certificateText}>
+                <Text style={{fontWeight: '700'}}>Vision:</Text> {vision}
+              </Text>
+              {/* {'\n'} */}
+              <Text style={styles.certificateText}>
+                <Text style={{fontWeight: '700'}}>{'\n'}Mission:</Text>{' '}
+                {mission}
+              </Text>
+              {/* <Text style={styles.certificateText}>
                   Expiry date: {certificate.expDate}
                 </Text> */}
-              </View>
+            </View>
             {/* ))} */}
           </View>
-        ) :  selectedTabMenu === 'Our Team' ? (
+        ) : selectedTabMenu === 'Our Team' ? (
           <View style={styles.mealContainer1}>
             {/* {certificateList.map((certificate: any, index: number) => ( */}
-              <View style={styles.titleContainer1}>
-                      {/* <Text style={styles.title1}>Certificate List</Text> */}
-            
-                      <Text style={styles.certificateText}>
-  <Text style={{ fontWeight: '700' }}>Founders: </Text>
-  {orphanage?.founderName1}
-  {orphanage?.founderName2 ? `, ${orphanage.founderName2}` : ''}
-</Text>
-                {/* {'\n'} */}
-                {/* <Text style={styles.certificateText}>
+            <View style={styles.titleContainer1}>
+              {/* <Text style={styles.title1}>Certificate List</Text> */}
+
+              <Text style={styles.certificateText}>
+                <Text style={{fontWeight: '700'}}>Founders: </Text>
+                {orphanage?.founderName1}
+                {orphanage?.founderName2 ? `, ${orphanage.founderName2}` : ''}
+              </Text>
+              {/* {'\n'} */}
+              {/* <Text style={styles.certificateText}>
                 <Text style={{fontWeight: '700'}}>{'\n'}Mission:</Text> {orphanage?.founderName2}
                 </Text> */}
-                {/* <Text style={styles.certificateText}>
+              {/* <Text style={styles.certificateText}>
                   Expiry date: {certificate.expDate}
                 </Text> */}
-              </View>
+            </View>
             {/* ))} */}
           </View>
         ) : (
@@ -411,11 +408,13 @@ const OrphanageScreen = ({route}) => {
                     </View>
                     <View style={styles.list}>
                       <View style={styles.dotedLined} />
-                      {meals?.[day]?.[mealType]?.map((item: string, itemIdx: number) => (
-                        <Text key={itemIdx} style={styles.item}>
-                          • {item}
-                        </Text>
-                      ))}
+                      {meals?.[day]?.[mealType]?.map(
+                        (item: string, itemIdx: number) => (
+                          <Text key={itemIdx} style={styles.item}>
+                            • {item}
+                          </Text>
+                        ),
+                      )}
                     </View>
                   </View>
                 ))}
@@ -426,27 +425,23 @@ const OrphanageScreen = ({route}) => {
       </GradiantProvider>
     );
   };
-  
-  
 
   return (
     <>
       <ContainerProvider>
         <TopInfoBar type={1} headerTitle="Orphanage Details" />
         <ScrollView bounces={false}>
-          {OrphanageDetails?.map(
-            (orphanage: any, index: number) => {
-              return (
-                <View style={[styles.bodyContainer]} key={index}>
-                  {_fist_section(orphanage)}
-                  {/* {_second_section()} */}
-                  {_third_section(orphanage)}
-                  {_tab_section()}
-                  {_fourth_section(orphanage)}
-                </View>
-              );
-            },
-          )}
+          {OrphanageDetails?.map((orphanage: any, index: number) => {
+            return (
+              <View style={[styles.bodyContainer]} key={index}>
+                {_fist_section(orphanage)}
+                {/* {_second_section()} */}
+                {_third_section(orphanage)}
+                {_tab_section()}
+                {_fourth_section(orphanage)}
+              </View>
+            );
+          })}
         </ScrollView>
         {/* <MealProviderModal
           setModalVisible={setModalVisible}
@@ -681,74 +676,74 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 5,
   },
-    mealContainer1: {
-      width: '100%', // Take full width of the screen
-      padding: 16, // Add consistent padding
-      backgroundColor: '#fff', // White background for the container
-      borderRadius: 10, // Rounded corners
-      shadowColor: '#000', // Shadow for elevation
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-      elevation: 3, // Shadow for Android
-      marginBottom: 16, // Add spacing between containers
-    },
-    title1: {
-      fontSize: 16, // Responsive font size for headings
-      fontWeight: 'bold', // Make it stand out
-      color: '#333', // Neutral text color
-      marginBottom: 8, // Space after title
-    },
-    titleContainer1: {
-      marginVertical: 8, // Spacing between each certificate item
-      padding: 8, // Padding inside each certificate container
-      borderBottomWidth: 1, // Add a bottom border
-      borderBottomColor: '#ccc', // Light gray color for the border
-    },
-    certificateText: {
-      fontSize: 14, // Font size for details
-      color: '#555', // Slightly lighter color for details
-      lineHeight: 24, // Line height for better readability
-    },
-    dayContainer: {
-      marginRight: 15, // Add spacing between days
-      padding: 10,
-      backgroundColor: '#fff',
-      borderRadius: 10,
-      shadowColor: '#000',
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-      width: 250, // Set a fixed width for each day's container
-    },
-    dayTitle: {
-      fontSize: 15,
-      fontWeight: 'bold',
-      marginBottom: 10,
-      color: '#333',
-      textAlign: 'center',
-    },
-    mealContainerM: {
-      marginBottom: 15,
-    },
-    titleContainerM: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 5,
-    },
-    list: {
-      backgroundColor: 'white',
-      padding: 10,
-      borderRadius: 10,
-    },
-    dotedLined: {
-      height: 1,
-      borderStyle: 'dotted',
-      borderColor: '#ccc',
-      borderWidth: 1,
-      marginVertical: 5,
-    },
-    item: {
-      fontSize: 14,
-      marginVertical: 2,
-    },
+  mealContainer1: {
+    width: '100%', // Take full width of the screen
+    padding: 16, // Add consistent padding
+    backgroundColor: '#fff', // White background for the container
+    borderRadius: 10, // Rounded corners
+    shadowColor: '#000', // Shadow for elevation
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3, // Shadow for Android
+    marginBottom: 16, // Add spacing between containers
+  },
+  title1: {
+    fontSize: 16, // Responsive font size for headings
+    fontWeight: 'bold', // Make it stand out
+    color: '#333', // Neutral text color
+    marginBottom: 8, // Space after title
+  },
+  titleContainer1: {
+    marginVertical: 8, // Spacing between each certificate item
+    padding: 8, // Padding inside each certificate container
+    borderBottomWidth: 1, // Add a bottom border
+    borderBottomColor: '#ccc', // Light gray color for the border
+  },
+  certificateText: {
+    fontSize: 14, // Font size for details
+    color: '#555', // Slightly lighter color for details
+    lineHeight: 24, // Line height for better readability
+  },
+  dayContainer: {
+    marginRight: 15, // Add spacing between days
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    width: 250, // Set a fixed width for each day's container
+  },
+  dayTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+    textAlign: 'center',
+  },
+  mealContainerM: {
+    marginBottom: 15,
+  },
+  titleContainerM: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  list: {
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 10,
+  },
+  dotedLined: {
+    height: 1,
+    borderStyle: 'dotted',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginVertical: 5,
+  },
+  item: {
+    fontSize: 14,
+    marginVertical: 2,
+  },
 });

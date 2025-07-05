@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   ScrollView,
@@ -9,10 +9,10 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
-  Linking
+  Linking,
 } from 'react-native';
 import ContainerProvider from '../components/providers/ContainerProvider';
-import { useAuthState } from '../context/AuthContext';
+import {useAuthState} from '../context/AuthContext';
 import {
   CalenderColorIcon,
   ErrorIcon,
@@ -22,25 +22,23 @@ import {
 import CustomButtonField from '../components/fields/CustomButtonField';
 import API_INSTANCE from '../config/apiClient';
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 const guidelineBaseWidth = 375;
 const scale = size => (width / guidelineBaseWidth) * size;
 
 const NeedsScreen = () => {
-  const { user } = useAuthState() ?? {};
+  const {user} = useAuthState() ?? {};
   const [needs, setNeeds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchNeedsData = async () => {
     try {
-      console.log(user);
       const response = await API_INSTANCE.post(
-        `/v1/orphanage/fetch-needs?id=${user?.orphanageId}`
+        `/v1/orphanage/fetch-needs?id=${user?.orphanageId}`,
       );
       const json = await response.data;
-      console.log(json.data);
-      
+
       if (!json.data) {
         throw new Error(json.message || 'Failed to fetch needs');
       }
@@ -56,26 +54,26 @@ const NeedsScreen = () => {
     }
   };
 
-    const dialCall = (number) => {
-      let phoneUrl = '';
-  
-      if (Platform.OS === 'android') {
-        phoneUrl = `tel:${number}`;
-      } else {
-        // iOS supports telprompt for a smoother experience
-        phoneUrl = `telprompt:${number}`;
-      }
-  
-      Linking.canOpenURL(phoneUrl)
-        .then((supported) => {
-          if (!supported) {
-            Alert.alert('Error', 'Phone dialer is not available');
-          } else {
-            return Linking.openURL(phoneUrl);
-          }
-        })
-        .catch((err) => console.error('An error occurred', err));
-    };
+  const dialCall = number => {
+    let phoneUrl = '';
+
+    if (Platform.OS === 'android') {
+      phoneUrl = `tel:${number}`;
+    } else {
+      // iOS supports telprompt for a smoother experience
+      phoneUrl = `telprompt:${number}`;
+    }
+
+    Linking.canOpenURL(phoneUrl)
+      .then(supported => {
+        if (!supported) {
+          Alert.alert('Error', 'Phone dialer is not available');
+        } else {
+          return Linking.openURL(phoneUrl);
+        }
+      })
+      .catch(err => console.error('An error occurred', err));
+  };
 
   useEffect(() => {
     fetchNeedsData();
@@ -89,9 +87,7 @@ const NeedsScreen = () => {
           <View style={styles.leftRow}>
             <Text style={styles.cardTitle}>{item.need}</Text>
           </View>
-          <View>
-            {item.approvalStatus ? <SuccessIcon /> : <ErrorIcon />}
-          </View>
+          <View>{item.approvalStatus ? <SuccessIcon /> : <ErrorIcon />}</View>
         </View>
 
         {/* Bottom Colored Section (contains the white details) */}
@@ -114,9 +110,7 @@ const NeedsScreen = () => {
             {/* End Date Row (no dotted border on last row) */}
             <View style={styles.detailRow}>
               <CalenderColorIcon width={18} height={18} />
-              <Text style={styles.detailText}>
-                End Date: {item.endDate}
-              </Text>
+              <Text style={styles.detailText}>End Date: {item.endDate}</Text>
             </View>
           </View>
         </View>
@@ -138,11 +132,10 @@ const NeedsScreen = () => {
   if (loading) {
     return (
       <ContainerProvider
-        headerProps={{ type: 2, headerTitle: `Hello, ${user?.firstName}` }}
-      >
+        headerProps={{type: 2, headerTitle: `Hello, ${user?.firstName}`}}>
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color="#0000ff" />
-          <Text style={{ marginTop: 10 }}>Loading...</Text>
+          <Text style={{marginTop: 10}}>Loading...</Text>
         </View>
       </ContainerProvider>
     );
@@ -151,8 +144,7 @@ const NeedsScreen = () => {
   if (error) {
     return (
       <ContainerProvider
-        headerProps={{ type: 2, headerTitle: `Hello, ${user?.firstName}` }}
-      >
+        headerProps={{type: 2, headerTitle: `Hello, ${user?.firstName}`}}>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
         </View>
@@ -162,15 +154,15 @@ const NeedsScreen = () => {
 
   return (
     <ContainerProvider
-      headerProps={{ type: 2, headerTitle: `Hello, ${user?.firstName}` }}
-    >
+      headerProps={{type: 2, headerTitle: `Hello, ${user?.firstName}`}}>
       <ScrollView
         style={styles.container}
         // If no needs are available, center the content vertically and horizontally.
         contentContainerStyle={
-          needs.length === 0 ? { flex: 1, justifyContent: 'center', alignItems: 'center' } : {}
-        }
-      >
+          needs.length === 0
+            ? {flex: 1, justifyContent: 'center', alignItems: 'center'}
+            : {}
+        }>
         {needs.length === 0 ? (
           <>
             <Image
@@ -178,7 +170,8 @@ const NeedsScreen = () => {
               style={styles.sponImage}
             />
             <Text style={styles.infoText}>
-            No Requirements from the Orphanage at the Moment, But We'll Keep You Updated!
+              No Requirements from the Orphanage at the Moment, But We'll Keep
+              You Updated!
             </Text>
           </>
         ) : (
@@ -242,7 +235,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     // Subtle shadow
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.15,
     shadowRadius: 6,
   },

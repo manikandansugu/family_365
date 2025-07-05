@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   ScrollView,
@@ -11,24 +11,26 @@ import {
   Pressable,
 } from 'react-native';
 import ContainerProvider from '../components/providers/ContainerProvider';
-import { useAuthState } from '../context/AuthContext';
+import {useAuthState} from '../context/AuthContext';
 import API_INSTANCE from '../config/apiClient';
-  
+
 // Utility function to convert ArrayBuffer to Base64
-export const bufferToBase64 = (buffer) => {
+export const bufferToBase64 = buffer => {
   const binary = [];
   const bytes = new Uint8Array(buffer);
   const chunkSize = 8192;
 
   for (let i = 0; i < bytes.length; i += chunkSize) {
-    binary.push(String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize)));
+    binary.push(
+      String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize)),
+    );
   }
 
   return btoa(binary.join(''));
 };
-  
+
 const GalleryScreen = () => {
-  const { user } = useAuthState() ?? {};
+  const {user} = useAuthState() ?? {};
   const [images, setImages] = useState([]); // To store the list of base64 images
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,9 +39,8 @@ const GalleryScreen = () => {
 
   const fetchImageData = async () => {
     try {
-      console.log('idddd', user?.orphanageId);
       const metadataResponse = await API_INSTANCE.get(
-        `v1/storage/fetch-all-files-info-from-storage?id=${user?.orphanageId}&uploaderType=ORPHANAGE`
+        `v1/storage/fetch-all-files-info-from-storage?id=${user?.orphanageId}&uploaderType=ORPHANAGE`,
       );
 
       const metadataJson = await metadataResponse.data;
@@ -48,12 +49,11 @@ const GalleryScreen = () => {
         throw new Error('Failed to fetch metadata');
       }
 
-      const imagePromises = metadataJson.data.map(async (item) => {
+      const imagePromises = metadataJson.data.map(async item => {
         const imagePath = encodeURIComponent(item.filePath); // Ensure filePath is URL-encoded
-        console.log(imagePath);
         const imageResponse = await API_INSTANCE.get(
           `v1/storage/fetch-any-file-from-storage-by-path?filePath=${imagePath}`,
-          { responseType: 'arraybuffer' }
+          {responseType: 'arraybuffer'},
         );
 
         const buffer = await imageResponse.data; // Fetch binary data
@@ -75,21 +75,27 @@ const GalleryScreen = () => {
     fetchImageData();
   }, []);
 
-  const handleImagePress = (image) => {
+  const handleImagePress = image => {
     setCurrentImage(image);
     setModalVisible(true);
   };
 
   return (
-    <ContainerProvider headerProps={{ type: 2, headerTitle: `Hello, ${user?.firstName}` }}>
+    <ContainerProvider
+      headerProps={{type: 2, headerTitle: `Hello, ${user?.firstName}`}}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={
-          !loading && !error && images.length === 0 ? { flex: 1, justifyContent: 'center', alignItems: 'center' } : {}
-        }
-      >
+          !loading && !error && images.length === 0
+            ? {flex: 1, justifyContent: 'center', alignItems: 'center'}
+            : {}
+        }>
         {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
+          <ActivityIndicator
+            size="large"
+            color="#0000ff"
+            style={styles.loader}
+          />
         ) : error ? (
           <Text style={styles.errorText}>{error}</Text>
         ) : images.length === 0 ? (
@@ -98,23 +104,22 @@ const GalleryScreen = () => {
               source={require('../assets/images/noact.png')}
               style={styles.sponImage}
             />
-            <Text style={styles.infoText}>
-              No gallery images for Orphanage
-            </Text>
+            <Text style={styles.infoText}>No gallery images for Orphanage</Text>
           </View>
         ) : (
           <>
             <Text style={styles.mainHeading}>Gallery</Text>
-            <Text style={styles.subHeading}>Discover Moments Captured at Our Orphanage</Text>
+            <Text style={styles.subHeading}>
+              Discover Moments Captured at Our Orphanage
+            </Text>
             <View style={styles.imageGrid}>
               {images.map((image, index) => (
                 <TouchableWithoutFeedback
                   key={index}
-                  onLongPress={() => handleImagePress(image)}
-                >
+                  onLongPress={() => handleImagePress(image)}>
                   <View style={styles.imageContainer}>
                     <Image
-                      source={{ uri: image }}
+                      source={{uri: image}}
                       style={styles.image}
                       resizeMode="contain"
                     />
@@ -129,8 +134,7 @@ const GalleryScreen = () => {
         visible={isModalVisible}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
+        onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <Pressable
             style={styles.modalBackground}
@@ -139,7 +143,7 @@ const GalleryScreen = () => {
           <View style={styles.modalContent}>
             {currentImage && (
               <Image
-                source={{ uri: currentImage }}
+                source={{uri: currentImage}}
                 style={styles.fullscreenImage}
                 resizeMode="contain"
               />
@@ -193,7 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,

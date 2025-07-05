@@ -17,7 +17,7 @@ const PaymentVerificationScreen = ({route}: any) => {
   const {showToast} = useToaster();
   const navigation = useNavigation<any>();
   const registerData = useSelector((state: RootState) => state.authSlice);
-  const {OrphanageDetails} = useSelector(
+  const {OrphanageDetails}: any = useSelector(
     (state: RootState) => state.orphanageDetails,
   );
   const {dataNew} = route.params;
@@ -50,10 +50,6 @@ const PaymentVerificationScreen = ({route}: any) => {
   }, [OrphanageDetails]);
 
   const onProceed = async () => {
-    navigation.navigate('paymentSummaryScreen', {
-      amount: formData?.amount,
-      dataNew: dataNew,
-    });
     try {
       if (formData?.amount && formData?.productInfo) {
         setLoading(true);
@@ -61,7 +57,11 @@ const PaymentVerificationScreen = ({route}: any) => {
           '/v2/payment/create-order',
           formData,
         );
-        console.log('response ', response);
+        navigation.navigate('paymentSummaryScreen', {
+          amount: formData?.amount,
+          dataNew: dataNew,
+          paymentDetails: response?.data?.data,
+        });
       } else {
         showToast({
           message: 'please fill all fields',
@@ -209,6 +209,14 @@ const PaymentVerificationScreen = ({route}: any) => {
   const numberOfMembers = memberData?.length ?? 1;
   const totalCost = costPerMember * numberOfMembers;
 
+  useEffect(() => {
+    setFormData((prv: any) => ({
+      ...prv,
+      amount: costPerMember?.toString(),
+      productInfo: 'family365',
+    }));
+  }, [OrphanageDetails]);
+
   const _receiptSection = () => {
     return (
       <View style={styles.receiptContainer}>
@@ -248,9 +256,9 @@ const PaymentVerificationScreen = ({route}: any) => {
       <View style={styles.idContainer}>
         <Text style={styles.idText}>Payment Verification</Text>
         {_receiptSection()}
-        <Text style={styles.idTextT}>UPI ID</Text>
+        {/* <Text style={styles.idTextT}>UPI ID</Text> */}
         {/* Profession Section */}
-        <View style={{marginBottom: 15}}>
+        {/* <View style={{marginBottom: 15}}>
           <TextInputComponent
             backgroundColor={theme.white}
             radius={16}
@@ -274,7 +282,7 @@ const PaymentVerificationScreen = ({route}: any) => {
             onChange={pIfo => setFormData({...formData, productInfo: pIfo})}
             value={formData.productInfo}
           />
-        </View>
+        </View> */}
       </View>
     );
   };

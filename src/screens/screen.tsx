@@ -1,4 +1,14 @@
-import {Alert, Clipboard, Image, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  Clipboard,
+  Image,
+  Linking,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ContainerProvider from '../components/providers/ContainerProvider';
 import ImageBackgroundProvider from '../components/providers/BackgroundGradiantProvider';
@@ -37,22 +47,19 @@ const PaymentVerificationScreen = ({route}) => {
   );
   const dataNew = route.params?.dataNew || {};
   const {registerForm, memberData}: any = registerData ?? {};
-  console.log('registerForm',registerForm)
-  console.log('OrphanageDetails',OrphanageDetails)
-  console.log('memberData',memberData)
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
-   const [transactionId, setTransactionId] = useState<string>();
+  const [transactionId, setTransactionId] = useState<string>();
 
-   const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
+  const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [digitalPaymentId, setDigitalPaymentId] = useState<string>();
 
   useEffect(() => {
-    const handleDeepLink = (event: { url: string }) => {
+    const handleDeepLink = (event: {url: string}) => {
       const url = event.url;
-      console.log('Incoming URL:', url);
       const data = parseUPIResponse(url);
-      console.log('Parsed Data:', data);
       if (data) {
         setPaymentResult(data);
         setModalVisible(true);
@@ -63,23 +70,23 @@ const PaymentVerificationScreen = ({route}) => {
     console.log('Deep Link Listener Added');
 
     // Handle initial URL if app was opened via a URL
-    Linking.getInitialURL().then((url) => {
+    Linking.getInitialURL().then(url => {
       console.log('Initial URL:', url);
       if (url) {
-        handleDeepLink({ url });
+        handleDeepLink({url});
       }
     });
 
     if (OrphanageDetails?.length > 0) {
       setDigitalPaymentId(OrphanageDetails[0]?.data?.digitalPaymentId);
     }
-        // Cleanup function to remove the listener
-        return () => {
-          subscription.remove();
-          console.log('Deep Link Listener Removed');
-        };
+    // Cleanup function to remove the listener
+    return () => {
+      subscription.remove();
+      console.log('Deep Link Listener Removed');
+    };
   }, [OrphanageDetails]);
-  
+
   const parseUPIResponse = (url: string): PaymentResult | null => {
     try {
       // Extract the query string part of the URL
@@ -96,7 +103,7 @@ const PaymentVerificationScreen = ({route}) => {
       const txnId = params['txnId'] || '';
       const status = params['status'] || 'UNKNOWN';
       const responseCode = params['responseCode'] || 'N/A';
-      return { txnId, status, responseCode };
+      return {txnId, status, responseCode};
     } catch (error) {
       console.error('Error parsing UPI response:', error);
       return null;
@@ -109,7 +116,6 @@ const PaymentVerificationScreen = ({route}) => {
     try {
       // Check if the device supports the UPI URL scheme
       const supported = await Linking.canOpenURL(upiUrl);
-      console.log('Supported:', supported);
 
       if (supported) {
         await Linking.openURL(upiUrl); // Open the UPI app
@@ -121,17 +127,19 @@ const PaymentVerificationScreen = ({route}) => {
       }
     } catch (error) {
       console.error('Error initiating UPI payment:', error);
-      Alert.alert('Error', 'Something went wrong while initiating the payment.');
+      Alert.alert(
+        'Error',
+        'Something went wrong while initiating the payment.',
+      );
     }
   };
-  
 
   const onProceed = async () => {
     setLoading(true);
     const error = handleTransactionValidation({
-        transactionId,
+      transactionId,
     });
-    console.log(error)
+    console.log(error);
 
     if (error) {
       setLoading(false);
@@ -172,13 +180,7 @@ const PaymentVerificationScreen = ({route}) => {
       };
       try {
         if (payload) {
-          console.log(`auth/signup/member?orphanageId=${Number(
-            OrphanageDetails?.at(0)?.data?.orphanageId,
-          )}&quantity=${Number(memberData?.length)}`)
-          console.log(`pay ${JSON.stringify(payload)}`)
-          const response: any
-           =
-           await API_INSTANCE.post(
+          const response: any = await API_INSTANCE.post(
             `auth/signup/member?orphanageId=${Number(
               OrphanageDetails?.at(0)?.data?.orphanageId,
             )}&quantity=${Number(memberData?.length)}`,
@@ -192,55 +194,54 @@ const PaymentVerificationScreen = ({route}) => {
             //   payload,
             // );
             let formattedPayload = [];
-            for(let index = 0; index < memberData?.length; index += 1){
-              const [day, month, year] = memberData[index]?.bookingDate.split('/');
-const monthMap = {
-  Jan: '01',
-  Feb: '02',
-  Mar: '03',
-  Apr: '04',
-  May: '05',
-  Jun: '06',
-  Jul: '07',
-  Aug: '08',
-  Sep: '09',
-  Oct: '10',
-  Nov: '11',
-  Dec: '12',
-};
-const formattedDate = `${year}-${monthMap[month]}-${day}`;
-const [dayD, monthD, yearD] = memberData[index]?.memberNameBookedDob.split('/');
-const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
+            for (let index = 0; index < memberData?.length; index += 1) {
+              const [day, month, year] =
+                memberData[index]?.bookingDate.split('/');
+              const monthMap = {
+                Jan: '01',
+                Feb: '02',
+                Mar: '03',
+                Apr: '04',
+                May: '05',
+                Jun: '06',
+                Jul: '07',
+                Aug: '08',
+                Sep: '09',
+                Oct: '10',
+                Nov: '11',
+                Dec: '12',
+              };
+              const formattedDate = `${year}-${monthMap[month]}-${day}`;
+              const [dayD, monthD, yearD] =
+                memberData[index]?.memberNameBookedDob.split('/');
+              const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
 
-              const res =  {
-                "memberId": response?.data?.data.memberId,
-                "totalPaymentMade": OrphanageDetails?.at(0)?.data?.mealAmountPerDay,
-                "bookingDate": formattedDate,
-                "orphanageId": OrphanageDetails?.at(0)?.data?.orphanageId,
-                "memberNameBooked": memberData[index]?.memberNameBooked,
-                "memberNameBookedDob": formattedDateDob,
-                "memberNameBookedDescription": memberData[index]?.memberBookedDescription
+              const res = {
+                memberId: response?.data?.data.memberId,
+                totalPaymentMade:
+                  OrphanageDetails?.at(0)?.data?.mealAmountPerDay,
+                bookingDate: formattedDate,
+                orphanageId: OrphanageDetails?.at(0)?.data?.orphanageId,
+                memberNameBooked: memberData[index]?.memberNameBooked,
+                memberNameBookedDob: formattedDateDob,
+                memberNameBookedDescription:
+                  memberData[index]?.memberBookedDescription,
               };
               formattedPayload.push(res);
             }
-            console.log('formatt', formattedPayload)
-            await API_INSTANCE.post(
-             `auth/member-booking`,
-             formattedPayload,
-           );
+            await API_INSTANCE.post(`auth/member-booking`, formattedPayload);
             const userWithOrphanageId = {
               ...response?.data?.data, // Spread existing user data
               orphanageId: OrphanageDetails?.at(0)?.data?.orphanageId, // Add orphanageId to the user object
             };
-            console.log(JSON.stringify(userWithOrphanageId));
             setLoading(false);
             navigation.navigate('paymentScreen', {
-              user: userWithOrphanageId
+              user: userWithOrphanageId,
             });
           }
         }
       } catch (error: any) {
-        console.log(error?.response?.data)
+        console.log(error?.response?.data);
         setLoading(false);
         showToast({
           message: error?.response?.data?.message,
@@ -258,7 +259,7 @@ const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
       Clipboard.setString(text ?? ''); // Copies text to clipboard
       Alert.alert('Copied', `${text} copied to clipboard`);
     };
-  
+
     return (
       <View style={styles.idContainer}>
         <Text style={styles.idText}>Payment Verification</Text>
@@ -266,7 +267,7 @@ const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
         {/* Profession Section */}
         <View style={styles.row}>
           <TextInput
-            style={[styles.input, { flex: 1 }]}
+            style={[styles.input, {flex: 1}]}
             value={digitalPaymentId}
             editable={false} // Make it read-only
             placeholder="UPI Id"
@@ -274,8 +275,7 @@ const formattedDateDob = `${yearD}-${monthMap[monthD]}-${dayD}`;
           />
           <TouchableOpacity
             style={styles.copyButton}
-            onPress={() => handleCopy(digitalPaymentId)}
-          >
+            onPress={() => handleCopy(digitalPaymentId)}>
             <Text style={styles.copyText}>Copy</Text>
           </TouchableOpacity>
         </View>

@@ -20,7 +20,7 @@ type RootStackParamList = {
   paymentScreen: undefined;
   paymentVerificationScreen: undefined;
   screen: undefined;
-  paymentSummaryScreen: {amount: number};
+  paymentSummaryScreen: {amount: number; paymentDetails: any; dataNew: any};
 };
 
 const AuthNavigator = () => {

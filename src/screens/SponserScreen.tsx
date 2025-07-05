@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   ScrollView,
   View,
@@ -15,8 +15,8 @@ import ContainerProvider from '../components/providers/ContainerProvider';
 import CustomButtonField from '../components/fields/CustomButtonField';
 import HeaderView from '../components/view/HeaderView';
 import GradiantProvider from '../components/providers/GradiantProvider';
-import { meals } from '../entities/mockdata';
-import { theme } from '../utils/theme';
+import {meals} from '../entities/mockdata';
+import {theme} from '../utils/theme';
 import {
   AddMemberIcon,
   ChildrenHomeIcon,
@@ -24,16 +24,16 @@ import {
   FoodIcon,
   UserIcon,
 } from '../assets/svg';
-import { useAuthState } from '../context/AuthContext';
+import {useAuthState} from '../context/AuthContext';
 import API_INSTANCE from '../config/apiClient';
 
 // Get screen dimensions and define a scaling function
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 const guidelineBaseWidth = 375;
 const scale = size => (width / guidelineBaseWidth) * size;
 
 const SponserScreen = () => {
-  const { user } = useAuthState() ?? {};
+  const {user} = useAuthState() ?? {};
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState(today);
   const [sponsors, setSponsors] = useState([]); // API response
@@ -44,12 +44,11 @@ const SponserScreen = () => {
   const fetchSponsors = async () => {
     try {
       const response = await API_INSTANCE.get(
-        `v1/family-member/fetch-all-bookings-orphanage?orphangeId=${user?.orphanageId}`
+        `v1/family-member/fetch-all-bookings-orphanage?orphangeId=${user?.orphanageId}`,
       );
       const result = await response.data;
 
       if (result.data) {
-        console.log('sponsor', result?.data);
         setSponsors(result.data);
       } else {
         throw new Error('Failed to fetch sponsor data');
@@ -84,16 +83,15 @@ const SponserScreen = () => {
 
   const dates = generateDates();
 
-  const getMonthName = (date) => {
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const getMonthName = date => {
+    return date.toLocaleDateString('en-US', {month: 'long', year: 'numeric'});
   };
 
   const _meal_section = () => {
     return (
       <GradiantProvider
         style={styles.fourthSection}
-        colors={['#B7D4FF', '#B7D4FF']}
-      >
+        colors={['#B7D4FF', '#B7D4FF']}>
         {meals.map((meal, index) => (
           <View key={index} style={styles.mealContainer}>
             <View style={styles.titleContainer}>
@@ -128,8 +126,8 @@ const SponserScreen = () => {
             data={dates}
             horizontal
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.toDateString()}
-            renderItem={({ item }) => {
+            keyExtractor={item => item.toDateString()}
+            renderItem={({item}) => {
               const isSelected =
                 item.toDateString() === selectedDate.toDateString();
               return (
@@ -138,23 +136,14 @@ const SponserScreen = () => {
                   style={[
                     styles.dateItem,
                     isSelected && styles.activeDateItem,
-                  ]}
-                >
+                  ]}>
                   <Text
-                    style={[
-                      styles.dateText,
-                      isSelected && styles.activeText,
-                    ]}
-                  >
+                    style={[styles.dateText, isSelected && styles.activeText]}>
                     {item.getDate()}
                   </Text>
                   <Text
-                    style={[
-                      styles.dayText,
-                      isSelected && styles.activeText,
-                    ]}
-                  >
-                    {item.toLocaleDateString('en-US', { weekday: 'short' })}
+                    style={[styles.dayText, isSelected && styles.activeText]}>
+                    {item.toLocaleDateString('en-US', {weekday: 'short'})}
                   </Text>
                 </Pressable>
               );
@@ -183,15 +172,15 @@ const SponserScreen = () => {
                 />
                 {/* Filtered Sponsors List */}
                 {sponsors.filter(
-                  (sponsor) =>
+                  sponsor =>
                     sponsor.bookingDate ===
-                    selectedDate.toISOString().split('T')[0]
+                    selectedDate.toISOString().split('T')[0],
                 ).length > 0 ? (
                   sponsors
                     .filter(
-                      (sponsor) =>
+                      sponsor =>
                         sponsor.bookingDate ===
-                        selectedDate.toISOString().split('T')[0]
+                        selectedDate.toISOString().split('T')[0],
                     )
                     .map((sponsor, i) => (
                       <View key={i} style={styles.sponsorRow}>
@@ -214,9 +203,8 @@ const SponserScreen = () => {
                         <View style={styles.sponsorDesc}>
                           <RNScrollView
                             style={styles.descScroll}
-                            contentContainerStyle={{ paddingBottom: scale(5) }}
-                            nestedScrollEnabled={true}
-                          >
+                            contentContainerStyle={{paddingBottom: scale(5)}}
+                            nestedScrollEnabled={true}>
                             <Text style={styles.descText}>
                               Reason: {sponsor.memberNameBookedDescription}
                             </Text>
@@ -225,19 +213,26 @@ const SponserScreen = () => {
                       </View>
                     ))
                 ) : (
-                  <View>  <Image
-                  source={require('../assets/images/nospon.png')}
-                  style={styles.sponImage}
-                />
-                  <Text style={styles.noSponsorText}>
-                  "No Sponsor for Food Today, But We Appreciate Your Support!"
-                  </Text>
+                  <View>
+                    {' '}
+                    <Image
+                      source={require('../assets/images/nospon.png')}
+                      style={styles.sponImage}
+                    />
+                    <Text style={styles.noSponsorText}>
+                      "No Sponsor for Food Today, But We Appreciate Your
+                      Support!"
+                    </Text>
                   </View>
                 )}
               </View>
 
               {/* Impact Story Section */}
-              <View style={[styles.card, { backgroundColor: '#F2BD7F', marginTop: scale(6) }]}>
+              <View
+                style={[
+                  styles.card,
+                  {backgroundColor: '#F2BD7F', marginTop: scale(6)},
+                ]}>
                 <CustomButtonField
                   buttonText={`Impact Story`}
                   onPress={() => {}}
@@ -252,7 +247,8 @@ const SponserScreen = () => {
                   />
                   <View style={styles.impactTextContainer}>
                     <Text style={styles.quoteText}>
-                      "Food served to God doesn't reach a man, but the food served to a hungry man reaches God.."
+                      "Food served to God doesn't reach a man, but the food
+                      served to a hungry man reaches God.."
                     </Text>
                   </View>
                 </View>
@@ -287,9 +283,8 @@ const SponserScreen = () => {
                 <View style={styles.listSponsorDesc}>
                   <RNScrollView
                     style={styles.descScroll}
-                    contentContainerStyle={{ paddingBottom: scale(5) }}
-                    nestedScrollEnabled={true}
-                  >
+                    contentContainerStyle={{paddingBottom: scale(5)}}
+                    nestedScrollEnabled={true}>
                     <Text style={styles.descText}>
                       Reason: {sponsor.memberNameBookedDescription}
                     </Text>
@@ -309,9 +304,7 @@ const SponserScreen = () => {
   return (
     <ContainerProvider>
       <HeaderView type={3} headerTitle="Sponsors" />
-      <ScrollView style={{ width: width }}>
-        {MealScheduleScreen()}
-      </ScrollView>
+      <ScrollView style={{width: width}}>{MealScheduleScreen()}</ScrollView>
     </ContainerProvider>
   );
 };

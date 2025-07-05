@@ -6,14 +6,14 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import ContainerProvider from '../components/providers/ContainerProvider';
 import HeaderView from '../components/view/HeaderView';
-import { COLOR } from '../utils/colors';
+import {COLOR} from '../utils/colors';
 import GradiantProvider from '../components/providers/GradiantProvider';
 import CustomButtonField from '../components/fields/CustomButtonField';
-import { theme } from '../utils/theme';
-import { useAuthState } from '../context/AuthContext';
+import {theme} from '../utils/theme';
+import {useAuthState} from '../context/AuthContext';
 import {
   FlagIcon,
   NotificationIcon,
@@ -25,14 +25,14 @@ import {
   ProfileSponserIcon,
   RightArrowIcon,
 } from '../assets/svg';
-import { AppDispatch } from '../redux/store';
-import { useDispatch } from 'react-redux';
-import { resetState } from '../redux/slices/dataSlice';
+import {AppDispatch} from '../redux/store';
+import {useDispatch} from 'react-redux';
+import {resetState} from '../redux/slices/dataSlice';
 import {useToaster} from '../components/providers/ToasterProvider';
 
 // --- Import the navigation hook
-import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
+import type {StackNavigationProp} from '@react-navigation/stack';
 import API_INSTANCE from '../config/apiClient';
 
 // Example stack param list; adjust to match your navigation setup
@@ -43,7 +43,10 @@ type RootStackParamList = {
 };
 
 // Type for navigation hook, referencing our stack params
-type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profile'>;
+type ProfileScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'Profile'
+>;
 
 const profileListData = [
   {
@@ -73,99 +76,95 @@ const profileListData = [
 ];
 
 const ProfileScreen = () => {
-    const {showToast} = useToaster();
-  const { user, setUser } = useAuthState() ?? {};
+  const {showToast} = useToaster();
+  const {user, setUser} = useAuthState() ?? {};
   const dispatch = useDispatch<AppDispatch>();
-    const [sponsors, setSponsors] = useState([]); // To store API response
-    const [error, setError] = useState(null); // Error state
+  const [sponsors, setSponsors] = useState([]); // To store API response
+  const [error, setError] = useState(null); // Error state
 
-    const formatDate = (dateStr) => {
-      const dateObj = new Date(dateStr);
-      return dateObj.toLocaleDateString('en-US', {
-        month: 'long',
-        day: '2-digit',
-        year: 'numeric',
+  const formatDate = dateStr => {
+    const dateObj = new Date(dateStr);
+    return dateObj.toLocaleDateString('en-US', {
+      month: 'long',
+      day: '2-digit',
+      year: 'numeric',
+    });
+  };
+
+  function getUpcomingBookingDate(bookings) {
+    // Get today's date with time set to 00:00:00
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Filter for future bookings (including today)
+    const futureBookings = bookings.filter(booking => {
+      const bookingDate = new Date(booking.bookingDate);
+      const bookingDateOnly = new Date(
+        bookingDate.getFullYear(),
+        bookingDate.getMonth(),
+        bookingDate.getDate(),
+      );
+      return bookingDateOnly >= today;
+    });
+
+    if (futureBookings.length > 0) {
+      // Find the earliest future booking date
+      const upcomingBooking = futureBookings.reduce((earliest, current) => {
+        const earliestDate = new Date(earliest.bookingDate);
+        const currentDate = new Date(current.bookingDate);
+        return earliestDate <= currentDate ? earliest : current;
       });
-    };
-
-    function getUpcomingBookingDate(bookings) {
-      // Get today's date with time set to 00:00:00
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
-      // Filter for future bookings (including today)
-      const futureBookings = bookings.filter((booking) => {
+      return upcomingBooking.bookingDate;
+    } else {
+      // If no future bookings, then check for past bookings
+      const pastBookings = bookings.filter(booking => {
         const bookingDate = new Date(booking.bookingDate);
         const bookingDateOnly = new Date(
           bookingDate.getFullYear(),
           bookingDate.getMonth(),
-          bookingDate.getDate()
+          bookingDate.getDate(),
         );
-        return bookingDateOnly >= today;
+        return bookingDateOnly < today;
       });
-    
-      if (futureBookings.length > 0) {
-        // Find the earliest future booking date
-        const upcomingBooking = futureBookings.reduce((earliest, current) => {
-          const earliestDate = new Date(earliest.bookingDate);
+
+      if (pastBookings.length > 0) {
+        // Find the most recent past booking date
+        const recentBooking = pastBookings.reduce((latest, current) => {
+          const latestDate = new Date(latest.bookingDate);
           const currentDate = new Date(current.bookingDate);
-          return earliestDate <= currentDate ? earliest : current;
+          return latestDate >= currentDate ? latest : current;
         });
-        return upcomingBooking.bookingDate;
+        return recentBooking.bookingDate;
       } else {
-        // If no future bookings, then check for past bookings
-        const pastBookings = bookings.filter((booking) => {
-          const bookingDate = new Date(booking.bookingDate);
-          const bookingDateOnly = new Date(
-            bookingDate.getFullYear(),
-            bookingDate.getMonth(),
-            bookingDate.getDate()
-          );
-          return bookingDateOnly < today;
-        });
-    
-        if (pastBookings.length > 0) {
-          // Find the most recent past booking date
-          const recentBooking = pastBookings.reduce((latest, current) => {
-            const latestDate = new Date(latest.bookingDate);
-            const currentDate = new Date(current.bookingDate);
-            return latestDate >= currentDate ? latest : current;
-          });
-          return recentBooking.bookingDate;
-        } else {
-          return null;
-        }
+        return null;
       }
     }
-    
+  }
 
-    
-    const fetchSponsors = async () => {
-      try {
-        const response = await API_INSTANCE.get(
-          `v1/family-member/fetch-all-bookings-orphanage?orphangeId=${user?.orphanageId}`
-        );
-        const result = await response.data;
-    
-        if (result.data) {
-          console.log('sponsor', result?.data);
-          const bookingDate = getUpcomingBookingDate(result?.data);
-          if (bookingDate) {
-            setSponsors(formatDate(bookingDate));
-          } else {
-            setSponsors('No sponsored meal');
-          }
+  const fetchSponsors = async () => {
+    try {
+      const response = await API_INSTANCE.get(
+        `v1/family-member/fetch-all-bookings-orphanage?orphangeId=${user?.orphanageId}`,
+      );
+      const result = await response.data;
+
+      if (result.data) {
+        const bookingDate = getUpcomingBookingDate(result?.data);
+        if (bookingDate) {
+          setSponsors(formatDate(bookingDate));
         } else {
-          throw new Error('Failed to fetch sponsor data');
+          setSponsors('No sponsored meal');
         }
-      } catch (err) {
-        console.error(err);
-        setError('No sponsor data available for today');
-      } finally {
-        // setLoading(false);
+      } else {
+        throw new Error('Failed to fetch sponsor data');
       }
-    };
-    
+    } catch (err) {
+      console.error(err);
+      setError('No sponsor data available for today');
+    } finally {
+      // setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchSponsors();
@@ -207,7 +206,6 @@ const ProfileScreen = () => {
       //   slideFrom: 'right',
       // });
       navigation.navigate('raiseIssueScreen');
-      
     }
     if (title === 'Donation History') {
       // show
@@ -246,8 +244,7 @@ const ProfileScreen = () => {
       <Pressable
         key={index}
         onPress={() => handleListItemPress(item.title)} // Attach press handler
-        style={{ flexDirection: 'row', marginTop: 16, marginBottom: 12 }}
-      >
+        style={{flexDirection: 'row', marginTop: 16, marginBottom: 12}}>
         <View style={styles.profileLeft}>
           <View style={styles.listIconOuter}>{item?.icon}</View>
           <Text style={styles.listText}>{item?.title}</Text>
@@ -274,7 +271,7 @@ const ProfileScreen = () => {
         }}>
         <Image
           source={require('../assets/images/food.png')}
-          style={{ height: 100, width: 100 }}
+          style={{height: 100, width: 100}}
         />
         <View
           style={{
@@ -283,8 +280,8 @@ const ProfileScreen = () => {
             alignItems: 'center',
             rowGap: 10,
           }}>
-          <Text style={{ fontSize: 16, fontWeight: '700', color: COLOR.white }}>
-          Date of Meal Sponsorship{' '}
+          <Text style={{fontSize: 16, fontWeight: '700', color: COLOR.white}}>
+            Date of Meal Sponsorship{' '}
           </Text>
           <CustomButtonField
             style={{
@@ -298,8 +295,10 @@ const ProfileScreen = () => {
             buttonText={sponsors}
             opacity={1}
             textColor={theme.white}
-            onPress={() => {navigation.navigate('sponserScreen')}}
-            textStyle={{ fontSize: 14 }}
+            onPress={() => {
+              navigation.navigate('sponserScreen');
+            }}
+            textStyle={{fontSize: 14}}
           />
         </View>
       </GradiantProvider>
@@ -308,7 +307,7 @@ const ProfileScreen = () => {
 
   const _formSection = () => {
     return (
-      <View style={{ flex: 3 }}>
+      <View style={{flex: 3}}>
         {profileListData?.map((item, index) => {
           return (
             <View key={index}>
@@ -329,26 +328,28 @@ const ProfileScreen = () => {
   return (
     <ContainerProvider>
       <HeaderView type={4} headerTitle="Profile" />
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
         {/* Name Section */}
-        <View style={{ flex: 0.3, justifyContent: 'center', alignItems: 'center' }}>
+        <View
+          style={{flex: 0.3, justifyContent: 'center', alignItems: 'center'}}>
           {_nameSection()}
         </View>
 
         {/* Image Section */}
-        <View style={{ flex: 0.4, paddingHorizontal: 16 }}>
+        <View style={{flex: 0.4, paddingHorizontal: 16}}>
           {_imageSection()}
         </View>
 
         {/* Form Section */}
-        <View style={{ flex: 1, paddingHorizontal: 16 }}>
-          <ScrollView contentContainerStyle={{ paddingBottom: 16 }}>
+        <View style={{flex: 1, paddingHorizontal: 16}}>
+          <ScrollView contentContainerStyle={{paddingBottom: 16}}>
             {_formSection()}
           </ScrollView>
         </View>
 
         {/* Footer Section */}
-        <View style={{ flex: 0.2, justifyContent: 'center', alignItems: 'center' }}>
+        <View
+          style={{flex: 0.2, justifyContent: 'center', alignItems: 'center'}}>
           <Pressable
             onPress={() => {
               dispatch(resetState());
@@ -363,9 +364,9 @@ const ProfileScreen = () => {
               marginBottom: 10,
               borderRadius: 16,
             }}>
-            <Text style={{ color: COLOR.black, fontSize: 14 }}>Logout</Text>
+            <Text style={{color: COLOR.black, fontSize: 14}}>Logout</Text>
           </Pressable>
-          <Text style={{ color: COLOR.black, fontSize: 14 }}>Family365</Text>
+          <Text style={{color: COLOR.black, fontSize: 14}}>Family365</Text>
         </View>
       </View>
     </ContainerProvider>

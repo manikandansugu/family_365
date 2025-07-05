@@ -48,7 +48,6 @@ const HomeScreen = () => {
   // const [memberDetails, setMemberDetails] = useState(null); // Store API response
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
-  console.log('api', user);
   // console.log('memberDetails', memberDetails)
 
   const fetchMemberDetails = useCallback(async () => {
@@ -75,9 +74,7 @@ const HomeScreen = () => {
         });
       }
       setOrphanageDetails(response1?.data?.data);
-      console.log('ress', response1?.data?.data);
       const orphanageId = response1?.data?.data?.orphanageId;
-      console.log(`ooooo ${orphanageId}`);
       const response2 = await API_INSTANCE.get(
         `v1/storage/fetch-logo-for-orphanage`,
         {

@@ -13,6 +13,7 @@ import {useToaster} from '../components/providers/ToasterProvider';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../redux/store';
 import TextFieldDropdown from '../components/fields/TextFieldDropdown';
+import CustomModal from '../components/modal/CustommodalComponent';
 
 // type errorType = {
 //   message: string;
@@ -29,10 +30,8 @@ const IdentityVerificationScreen = () => {
     (state: RootState) => state.orphanageDetails,
   );
   const {registerForm, memberData}: any = registerData ?? {};
-  console.log('registerForm', registerForm);
-  console.log('OrphanageDetails', OrphanageDetails);
-  console.log('memberData', memberData);
   const [isModalVisible, setModalVisible] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [consentText, setConsentText] = useState<string[]>([
     'Agree',
     'Do Not Agree',
@@ -99,6 +98,7 @@ const IdentityVerificationScreen = () => {
     //   profession,
     //   // selectedConsentText,
     // });
+    setIsVisible(false);
     const error: any = validation({
       pan,
       blood,
@@ -301,7 +301,7 @@ const IdentityVerificationScreen = () => {
             borderColor="white" // 🔹 Custom border color
             borderWidth={2} // 🔹 Custom border width
             borderRadius={10} // 🔹 Custom border radius
-            width={380} // 🔹 Custom width
+            width={350} // 🔹 Custom width
             onChange={setBlood}
             textColor={theme.black}
             hoveredIndex={hoveredIndex}
@@ -388,7 +388,10 @@ const IdentityVerificationScreen = () => {
         textColor={theme.white}
         style={styles.button}
         opacity={0.1}
-        onPress={onProceed}
+        onPress={() => {
+          if (isVisible) return;
+          setIsVisible(true);
+        }}
         textStyle={styles.buttonText}
       />
     );
@@ -412,6 +415,13 @@ const IdentityVerificationScreen = () => {
           {_identityGroupSection()}
           {_your_Consent()}
           {_buttonSection()}
+          <View>
+            <CustomModal
+              visible={isVisible}
+              onAccept={onProceed}
+              onDecline={() => setIsVisible(false)}
+            />
+          </View>
         </ImageBackgroundProvider>
       </KeyboardAvoidingProvider>
     </ContainerProvider>

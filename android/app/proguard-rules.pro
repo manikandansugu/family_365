@@ -7,4 +7,10 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# Add any project specific keep options here:
+# Added to fix R8 missing classes issue
+-dontwarn proguard.annotation.Keep
+-dontwarn proguard.annotation.KeepClassMembers
+
+# Keep Razorpay classes (from earlier error)
+-keep class com.razorpay.** { *; }
+-dontwarn com.razorpay.**

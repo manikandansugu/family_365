@@ -16,7 +16,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../redux/store';
 import {registerForm} from '../redux/slices/authSlice';
 import axios from 'axios';
-import { COLOR } from '../utils/colors';
+import {COLOR} from '../utils/colors';
 // import { allCountry } from '../entities/mockdata';
 
 const RegisterComponent = () => {
@@ -39,21 +39,30 @@ const RegisterComponent = () => {
   // Function to fetch City & State using Pincode API
   const fetchLocationDetails = async (pincode: string) => {
     try {
-      console.log(pinCode)
-      const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`);
-      if (response.data && response.data[0].Status === "Success") {
+      const response = await axios.get(
+        `https://api.postalpincode.in/pincode/${pincode}`,
+      );
+      if (response.data && response.data[0].Status === 'Success') {
         const postOfficeDetails = response.data[0].PostOffice[0];
         setState(postOfficeDetails.State); // Set State from API response
         setCity(postOfficeDetails.District); // Set City from API response
-        setCountry(postOfficeDetails.Country)
+        setCountry(postOfficeDetails.Country);
       } else {
-        showToast({ message: "Invalid Pincode", duration: 3000, status: "error" });
+        showToast({
+          message: 'Invalid Pincode',
+          duration: 3000,
+          status: 'error',
+        });
         setState('');
         setCity('');
         setCountry('');
       }
     } catch (error) {
-      showToast({ message: "Error fetching Pincode details", duration: 3000, status: "error" });
+      showToast({
+        message: 'Error fetching Pincode details',
+        duration: 3000,
+        status: 'error',
+      });
       setState('');
       setCountry('');
     }
@@ -156,30 +165,27 @@ const RegisterComponent = () => {
                   onChange={setEmail}
                   value={email}
                 />
-                    <View style={{backgroundColor: 'white', borderRadius: 10, }}>
-        
-        <TextFieldDropdown
-         radius={16}
-         height={40}
-         borderWidth={0.1}
-         textColor={theme.black}
-         backgroundColor={theme.white}
-         placeholder={'Gender'}
-         placeholderTextColor={theme.black}
-         dropDownValues={['Male', 'Female']}
-         onChange={setGender}
-         value={gender}
+                <View style={{backgroundColor: 'white', borderRadius: 10}}>
+                  <TextFieldDropdown
+                    radius={16}
+                    height={40}
+                    borderWidth={0.1}
+                    textColor={theme.black}
+                    backgroundColor={theme.white}
+                    placeholder={'Gender'}
+                    placeholderTextColor={theme.black}
+                    dropDownValues={['Male', 'Female']}
+                    onChange={setGender}
+                    value={gender}
+                    borderColor="#e9e9e9" // 🔹 Custom border color
+                    borderWidth={2} // 🔹 Custom border width
+                    borderRadius={20} // 🔹 Custom border radius
+                    //  width={380} // 🔹 Custom width
 
- 
-     borderColor="#e9e9e9" // 🔹 Custom border color
-     borderWidth={2} // 🔹 Custom border width
-     borderRadius={20} // 🔹 Custom border radius
-    //  width={380} // 🔹 Custom width
-  
-     hoveredIndex={hoveredIndex}
-     setHoveredIndex={setHoveredIndex}
-   />
-                      </View>
+                    hoveredIndex={hoveredIndex}
+                    setHoveredIndex={setHoveredIndex}
+                  />
+                </View>
                 {/* <TextFieldDropdown
                   radius={16}
                   height={40}
@@ -213,32 +219,32 @@ const RegisterComponent = () => {
                   onChange={setAddress2}
                   value={address2}
                 />
-              <View style={styles.rowContainer}>
-  <TextInputComponent
-    radius={16}
-    height={40}
-    width={140}
-    textColor={theme.black}
-    backgroundColor={theme.white}
-    placeholder={'City'}
-    placeholderTextColor={theme.black}
-    onChange={setCity}
-    value={city}
-    editable={false}
-  />
-  <TextInputComponent
-    radius={16}
-    height={40}
-    width={150}
-    textColor={theme.black}
-    backgroundColor={theme.white}
-    placeholder={'State'}
-    placeholderTextColor={theme.black}
-    onChange={setState}
-    value={state}
-    editable={false}
-  />
-</View>
+                <View style={styles.rowContainer}>
+                  <TextInputComponent
+                    radius={16}
+                    height={40}
+                    width={140}
+                    textColor={theme.black}
+                    backgroundColor={theme.white}
+                    placeholder={'City'}
+                    placeholderTextColor={theme.black}
+                    onChange={setCity}
+                    value={city}
+                    editable={false}
+                  />
+                  <TextInputComponent
+                    radius={16}
+                    height={40}
+                    width={150}
+                    textColor={theme.black}
+                    backgroundColor={theme.white}
+                    placeholder={'State'}
+                    placeholderTextColor={theme.black}
+                    onChange={setState}
+                    value={state}
+                    editable={false}
+                  />
+                </View>
 
                 {/* <TextInputComponent
                   radius={16}
@@ -262,16 +268,16 @@ const RegisterComponent = () => {
                   value={country}
                 /> */}
                 <TextInputComponent
-                 radius={16}
-                 height={40}
-                 textColor={theme.black}
-                 backgroundColor={'#f0f0f0'} // 🔹 Light gray background to indicate disabled state
-                 placeholder={'Pincode'}
-                 placeholderTextColor={theme.black}
-                 type="number"
-                 onChange={setPincode}
-                 value={pinCode}
-                 editable={false} 
+                  radius={16}
+                  height={40}
+                  textColor={theme.black}
+                  backgroundColor={'#f0f0f0'} // 🔹 Light gray background to indicate disabled state
+                  placeholder={'Pincode'}
+                  placeholderTextColor={theme.black}
+                  type="number"
+                  onChange={setPincode}
+                  value={pinCode}
+                  editable={false}
                   // style={{ opacity: 0.5 }}
                 />
               </View>
